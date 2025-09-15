@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import heroIllustration from "../../assets/dining.jpg"; // Replace with a more relevant club image if available
+import heroIllustration from "../../assets/abstract-php-c-analytics.jpg"; // Replace with a more relevant club image if available
 
 const HeroSection: React.FC = () => {
   return (
