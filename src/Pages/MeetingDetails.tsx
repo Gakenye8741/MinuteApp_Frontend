@@ -16,7 +16,7 @@ const MeetingDetailsPage: React.FC = () => {
   const { theme } = useTheme();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [openTopicId, setOpenTopicId] = useState<number | null>(null);
+  const [openTopicIds, setOpenTopicIds] = useState<number[]>([]);
 
   // Fetch meeting
   const { data: meetings, isLoading: meetingLoading, isError: meetingError } =
@@ -47,15 +47,15 @@ const MeetingDetailsPage: React.FC = () => {
     );
   }
 
-  // Function to determine attendee status color
-  const getStatusColor = (status: string) => {
+  // Helper to get attendee color
+  const getAttendeeColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "present":
-        return theme.secondary; // green
+        return theme.secondary;
       case "late":
-        return theme.accent; // red/orange
+        return theme.accent;
       case "absent":
-        return theme["neutral"]; // gray
+        return theme["base-content"] + "80";
       default:
         return theme["base-content"];
     }
@@ -64,20 +64,22 @@ const MeetingDetailsPage: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div
-        className="min-h-screen pt-[5rem] lg:pt-[6rem] pb-[4.5rem] lg:pb-0 px-4 sm:px-6 lg:px-20"
-        style={{ backgroundColor: theme["base-100"], color: theme["base-content"] }}
-      >
-        {/* Go Back Button at Top */}
+
+      {/* Back Button */}
+      <div className="px-4 sm:px-6 lg:px-20 pt-[6rem]">
         <button
           onClick={() => navigate(-1)}
-          className="mb-6 flex items-center gap-2 btn btn-outline"
+          className="btn btn-outline mb-4 flex items-center gap-2"
           style={{ borderColor: theme.primary, color: theme.primary }}
         >
-          <ArrowLeft className="w-4 h-4" />
-          Go Back
+          <ArrowLeft className="w-4 h-4" /> Go Back
         </button>
+      </div>
 
+      <div
+        className="min-h-screen pb-[4.5rem] lg:pb-0 px-4 sm:px-6 lg:px-20"
+        style={{ backgroundColor: theme["base-100"], color: theme["base-content"] }}
+      >
         {/* Meeting Header */}
         <div className="mb-8">
           <h1
@@ -86,17 +88,17 @@ const MeetingDetailsPage: React.FC = () => {
           >
             <FileText className="w-6 h-6" /> {meeting.title}
           </h1>
-          <p className="flex items-center gap-2 mb-2" style={{ color: theme["base-content"] + "CC" }}>
+          <p className="flex items-center gap-2 mb-2">
             <Calendar className="w-5 h-5" /> {new Date(meeting.date).toLocaleString()}
           </p>
           {meeting.description && (
-            <p style={{ color: theme["base-content"] + "AA" }}>{meeting.description}</p>
+            <p className="text-base-content/80">{meeting.description}</p>
           )}
         </div>
 
         {/* Attendees */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
             <UserCheck className="w-5 h-5" /> Attendees
           </h2>
           {attendees && attendees.length > 0 ? (
@@ -104,12 +106,7 @@ const MeetingDetailsPage: React.FC = () => {
               {attendees.map((a: any) => (
                 <li
                   key={a.id}
-                  style={{
-                    color: getStatusColor(a.status),
-                    backgroundColor: theme["base-200"],
-                    padding: "4px 8px",
-                    borderRadius: "4px",
-                  }}
+                  style={{ color: getAttendeeColor(a.status) }}
                 >
                   {a.name} - {a.email} ({a.status})
                 </li>
@@ -122,13 +119,13 @@ const MeetingDetailsPage: React.FC = () => {
 
         {/* Topics as collapsible dropdown */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
             <Book className="w-5 h-5" /> Topics
           </h2>
           {topics && topics.length > 0 ? (
             <div className="space-y-2">
               {topics.map((t: any) => {
-                const isOpen = openTopicId === t.id;
+                const isOpen = openTopicIds.includes(t.id);
                 return (
                   <div
                     key={t.id}
@@ -139,9 +136,13 @@ const MeetingDetailsPage: React.FC = () => {
                     }}
                   >
                     <button
-                      onClick={() =>
-                        setOpenTopicId(isOpen ? null : t.id)
-                      }
+                      onClick={() => {
+                        if (isOpen) {
+                          setOpenTopicIds(openTopicIds.filter((id) => id !== t.id));
+                        } else {
+                          setOpenTopicIds([...openTopicIds, t.id]);
+                        }
+                      }}
                       className="w-full px-4 py-2 flex justify-between items-center font-semibold"
                       style={{ color: theme["base-content"] }}
                     >
@@ -170,7 +171,7 @@ const MeetingDetailsPage: React.FC = () => {
 
         {/* Signatures */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
             <FileText className="w-5 h-5" /> Signatures
           </h2>
           {signatures && signatures.length > 0 ? (
@@ -187,6 +188,7 @@ const MeetingDetailsPage: React.FC = () => {
           )}
         </section>
       </div>
+
       <Footer />
     </>
   );
