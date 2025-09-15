@@ -27,6 +27,12 @@ export const Navbar = () => {
   const role = useSelector((state: RootState) => state.auth.role);
   const username = useSelector((state: RootState) => state.auth.user?.username);
 
+  const menuItems = [
+    { name: "Home", path: "/", icon: <Home className="w-4 h-4" /> },
+    { name: "About", path: "/About", icon: <FileQuestionMark className="w-4 h-4" /> },
+    { name: "Meetings", path: "/Meetings", icon: <BookAIcon className="w-4 h-4" /> },
+  ];
+
   const isActive = (path: string) => (location.pathname === path ? "text-primary font-bold" : "");
 
   const handleLogout = () => {
@@ -62,14 +68,19 @@ export const Navbar = () => {
             tabIndex={0}
             className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
           >
-            <li><Link to="/"><Home className="w-4 h-4" /> Home</Link></li>
-            <li><Link to="/About"><FileQuestionMark className="w-4 h-4" /> About</Link></li>
-            <li><Link to= "/Meetings"><Users className="w-4 h-4" /> Faculty</Link></li>
-            <li><a><Phone className="w-4 h-4" /> Contact</a></li>
+            {menuItems.map((item) => (
+              <li key={item.name}>
+                <Link to={item.path} className={isActive(item.path)}>
+                  {item.icon} {item.name}
+                </Link>
+              </li>
+            ))}
             {!isAuthenticated && (
-              <>
-                <li><Link to="/login"><LogIn className="w-4 h-4" /> Login</Link></li>
-              </>
+              <li>
+                <Link to="/login" className={isActive("/login")}>
+                  <LogIn className="w-4 h-4" /> Login
+                </Link>
+              </li>
             )}
           </ul>
         </div>
@@ -86,10 +97,13 @@ export const Navbar = () => {
       {/* Navbar Center (desktop menu) */}
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
-          <li><Link to="/" className={isActive("/")}><Home className="w-4 h-4" /> Home</Link></li>
-          <li><Link to="/About" className={isActive("/About")}><FileQuestionMark className="w-4 h-4" /> About</Link></li>
-          <li><Link to="/Meetings" className={isActive("/ Meetings")}><BookAIcon className="w-4 h-4" /> Meetings</Link></li>
-          
+          {menuItems.map((item) => (
+            <li key={item.name}>
+              <Link to={item.path} className={isActive(item.path)}>
+                {item.icon} {item.name}
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
 
@@ -130,7 +144,6 @@ export const Navbar = () => {
           </div>
         ) : (
           <div className="hidden lg:flex gap-2 font-chewy text-lg">
-            
             <Link to="/login" className={`btn btn-primary ${isActive("/login")}`}>
               <LogIn className="inline mr-2 h-4 w-4" /> Login
             </Link>
