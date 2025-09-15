@@ -3,6 +3,7 @@ import {
   Home,
   FileQuestionMark,
   LogIn,
+  ChevronDown,
   UserCheck,
   User,
   LogOut,
@@ -24,9 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
   const dispatch = useDispatch();
   const location = useLocation();
 
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.auth.isAuthenticated
-  );
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const role = useSelector((state: RootState) => state.auth.role);
   const username = useSelector((state: RootState) => state.auth.user?.username);
 
@@ -37,6 +36,17 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
   ];
 
   const handleLogout = () => dispatch(clearCredentials());
+
+  const getMobileTabStyles = (path: string) => {
+    const active = location.pathname === path;
+    if (active) {
+      return isDark
+        ? "bg-white text-black rounded-lg"
+        : "bg-black text-white rounded-lg";
+    } else {
+      return isDark ? "text-white" : "text-black";
+    }
+  };
 
   return (
     <>
@@ -49,7 +59,6 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           borderColor: theme["base-200"],
         }}
       >
-        {/* Left */}
         <div className="navbar-start flex-1 min-w-0">
           <Link
             to="/"
@@ -60,7 +69,6 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           </Link>
         </div>
 
-        {/* Center */}
         <div className="navbar-center flex-1 min-w-0">
           <ul className="menu menu-horizontal px-1 flex-1 flex-wrap">
             {menuItems.map((item) => (
@@ -68,14 +76,10 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
                 <Link
                   to={item.path}
                   className={`flex items-center gap-1 ${
-                    location.pathname === item.path ? "font-bold" : ""
+                    location.pathname === item.path
+                      ? `font-bold text-[${theme.primary}]`
+                      : `text-[${theme["base-content"]}]`
                   }`}
-                  style={{
-                    color:
-                      location.pathname === item.path
-                        ? theme.primary
-                        : theme["base-content"],
-                  }}
                 >
                   {item.icon} {item.name}
                 </Link>
@@ -84,7 +88,6 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           </ul>
         </div>
 
-        {/* Right */}
         <div className="navbar-end flex-1 min-w-0 justify-end gap-2">
           {children || <ThemeToggle />}
 
@@ -93,12 +96,10 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
               <label tabIndex={0} className="flex items-center cursor-pointer">
                 <div
                   className="btn btn-outline capitalize flex items-center gap-2"
-                  style={{
-                    borderColor: theme.primary,
-                    color: theme["base-content"],
-                  }}
+                  style={{ borderColor: theme.primary, color: theme["base-content"] }}
                 >
                   Hey {username}
+                  <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
                 </div>
               </label>
               <ul
@@ -110,14 +111,14 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
                   <li>
                     <Link
                       to="/Admindashboard/AllMeetings"
-                      className="flex items-center gap-2 font-bold"
+                      className="font-bold flex items-center gap-2"
                     >
                       <UserCheck className="h-5 w-5" /> Admin Dashboard
                     </Link>
                   </li>
                 ) : (
                   <li>
-                    <Link to="/dashboard" className="flex items-center gap-2 font-bold">
+                    <Link to="/dashboard" className="font-bold flex items-center gap-2">
                       <User className="h-5 w-5" /> User Dashboard
                     </Link>
                   </li>
@@ -152,27 +153,16 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           borderColor: isDark ? "#333" : "#d1d5db",
         }}
       >
-        {menuItems.map((item) => {
-          const active = location.pathname === item.path;
-          return (
-            <Link
-              key={item.name}
-              to={item.path}
-              className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition
-                ${active
-                  ? isDark
-                    ? "bg-white text-black"
-                    : "bg-black text-white"
-                  : ""
-                }
-                hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]
-              `}
-            >
-              {item.icon}
-              <span className="text-[10px] truncate">{item.name}</span>
-            </Link>
-          );
-        })}
+        {menuItems.map((item) => (
+          <Link
+            key={item.name}
+            to={item.path}
+            className={`flex flex-col items-center text-xs min-w-0 p-2 transition hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)] ${getMobileTabStyles(item.path)}`}
+          >
+            {item.icon}
+            <span className="text-[10px] truncate">{item.name}</span>
+          </Link>
+        ))}
 
         {/* Theme Toggle */}
         <div className="p-2 rounded-lg hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]">
@@ -184,9 +174,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           <div className="dropdown dropdown-top dropdown-end relative z-[9999]">
             <button
               tabIndex={0}
-              className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg
-                hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]
-              `}
+              className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)] ${getMobileTabStyles("/me")}`}
             >
               <User className="w-5 h-5" />
               <span className="text-[10px] truncate">Me</span>
@@ -219,9 +207,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         ) : (
           <Link
             to="/login"
-            className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg
-              hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]
-            `}
+            className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)] text-black`}
           >
             <LogIn className="w-5 h-5" />
             <span className="text-[10px] truncate">Login</span>
