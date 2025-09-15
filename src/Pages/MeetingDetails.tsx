@@ -27,7 +27,6 @@ const MeetingDetailsPage: React.FC = () => {
   const { data: topics, isLoading: topicsLoading } = useGetTopicsByMeetingIdQuery(id!);
   const { data: signatures, isLoading: signaturesLoading } = useGetSignaturesByMeetingIdQuery(Number(id));
 
-  // Loading state
   if (meetingLoading || attendeesLoading || topicsLoading || signaturesLoading) {
     return (
       <div className="flex justify-center items-center h-screen" style={{ backgroundColor: theme["base-100"] }}>
@@ -36,11 +35,10 @@ const MeetingDetailsPage: React.FC = () => {
     );
   }
 
-  // Error state
   if (meetingError || !meeting) {
     return (
       <div
-        className="flex justify-center items-center h-screen text-center"
+        className="flex justify-center items-center h-screen text-center px-4"
         style={{ color: theme.error, backgroundColor: theme["base-100"] }}
       >
         <p>Meeting not found or an error occurred.</p>
@@ -61,10 +59,10 @@ const MeetingDetailsPage: React.FC = () => {
             className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 flex items-center gap-2"
             style={{ color: theme.primary }}
           >
-            <FileText className="w-6 h-6" style={{ color: theme.primary }} /> {meeting.title}
+            <FileText className="w-6 h-6" /> {meeting.title}
           </h1>
           <p className="flex items-center gap-2 mb-2" style={{ color: theme["base-content"] + "CC" }}>
-            <Calendar className="w-5 h-5" style={{ color: theme["base-content"] + "80" }} /> {new Date(meeting.date).toLocaleString()}
+            <Calendar className="w-5 h-5" /> {new Date(meeting.date).toLocaleString()}
           </p>
           {meeting.description && (
             <p style={{ color: theme["base-content"] + "B3" }}>{meeting.description}</p>
@@ -73,24 +71,13 @@ const MeetingDetailsPage: React.FC = () => {
 
         {/* Attendees */}
         <section className="mb-6">
-          <h2
-            className="text-xl font-bold mb-2 flex items-center gap-2"
-            style={{ color: theme.primary }}
-          >
-            <UserCheck className="w-5 h-5" style={{ color: theme.primary }} /> Attendees
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+            <UserCheck className="w-5 h-5" /> Attendees
           </h2>
           {attendees && attendees.length > 0 ? (
-            <ul className="space-y-2">
+            <ul className="list-disc pl-5 space-y-1" style={{ color: theme["base-content"] }}>
               {attendees.map((a: any) => (
-                <li
-                  key={a.id}
-                  className="p-2 rounded-lg border shadow-sm"
-                  style={{
-                    backgroundColor: theme["base-200"],
-                    borderColor: theme["base-300"],
-                    color: theme["base-content"],
-                  }}
-                >
+                <li key={a.id}>
                   {a.name} - {a.email} ({a.status})
                 </li>
               ))}
@@ -102,25 +89,14 @@ const MeetingDetailsPage: React.FC = () => {
 
         {/* Topics */}
         <section className="mb-6">
-          <h2
-            className="text-xl font-bold mb-2 flex items-center gap-2"
-            style={{ color: theme.primary }}
-          >
-            <Book className="w-5 h-5" style={{ color: theme.primary }} /> Topics
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+            <Book className="w-5 h-5" /> Topics
           </h2>
           {topics && topics.length > 0 ? (
-            <ul className="space-y-2 list-decimal pl-5">
+            <ul className="list-decimal pl-5 space-y-1" style={{ color: theme["base-content"] }}>
               {topics.map((t: any) => (
-                <li
-                  key={t.id}
-                  className="p-2 rounded-lg border shadow-sm"
-                  style={{
-                    backgroundColor: theme["base-200"],
-                    borderColor: theme["base-300"],
-                    color: theme["base-content"],
-                  }}
-                >
-                  {t.title}
+                <li key={t.id}>
+                  {t.title || t.topic || t.name || "No Title"}
                 </li>
               ))}
             </ul>
@@ -131,24 +107,13 @@ const MeetingDetailsPage: React.FC = () => {
 
         {/* Signatures */}
         <section className="mb-6">
-          <h2
-            className="text-xl font-bold mb-2 flex items-center gap-2"
-            style={{ color: theme.primary }}
-          >
-            <FileText className="w-5 h-5" style={{ color: theme.primary }} /> Signatures
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+            <FileText className="w-5 h-5" /> Signatures
           </h2>
           {signatures && signatures.length > 0 ? (
-            <ul className="space-y-2">
+            <ul className="list-disc pl-5 space-y-1" style={{ color: theme["base-content"] }}>
               {signatures.map((s: any) => (
-                <li
-                  key={s.id}
-                  className="p-2 rounded-lg border shadow-sm"
-                  style={{
-                    backgroundColor: theme["base-200"],
-                    borderColor: theme["base-300"],
-                    color: theme["base-content"],
-                  }}
-                >
+                <li key={s.id}>
                   {s.signedBy} ({s.role})
                 </li>
               ))}
@@ -158,7 +123,6 @@ const MeetingDetailsPage: React.FC = () => {
           )}
         </section>
 
-        {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
           className="mt-4 btn btn-outline"
