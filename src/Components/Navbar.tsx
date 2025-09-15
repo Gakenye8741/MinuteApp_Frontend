@@ -49,15 +49,15 @@ export const Navbar = () => {
   return (
     <>
       {/* Desktop Navbar */}
-      <div className="navbar sticky top-0 z-50 bg-base-100/90 backdrop-blur text-base-content shadow-sm border-b border-base-300 transition-all hidden lg:flex">
-        <div className="navbar-start">
-          <Link to="/" className="btn btn-ghost text-xl font-bold leading-tight text-left">
+      <div className="navbar fixed top-0 left-0 right-0 z-50 bg-base-100/90 backdrop-blur text-base-content shadow-sm border-b border-base-300 flex flex-wrap hidden lg:flex">
+        <div className="navbar-start flex-1 min-w-0">
+          <Link to="/" className="btn btn-ghost text-xl font-bold leading-tight text-left whitespace-normal">
             Computing And Innovation <br /> Society of Laikipia University
           </Link>
         </div>
 
-        <div className="navbar-center">
-          <ul className="menu menu-horizontal px-1">
+        <div className="navbar-center flex-1 min-w-0">
+          <ul className="menu menu-horizontal px-1 flex-1 flex-wrap">
             {menuItems.map((item) => (
               <li key={item.name}>
                 <Link to={item.path} className={isActive(item.path)}>
@@ -68,7 +68,7 @@ export const Navbar = () => {
           </ul>
         </div>
 
-        <div className="navbar-end gap-2">
+        <div className="navbar-end gap-2 flex-1 min-w-0 justify-end">
           {/* Theme Toggle */}
           <button className="btn btn-ghost btn-circle" onClick={toggleTheme}>
             {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
@@ -111,24 +111,24 @@ export const Navbar = () => {
       </div>
 
       {/* Mobile Bottom Navbar */}
-      <div className="fixed bottom-0 left-0 w-full bg-base-100/90 backdrop-blur border-t border-base-300 shadow-inner lg:hidden z-50">
-        <div className="flex justify-around py-2 items-center">
+      <div className="fixed bottom-0 left-0 w-full bg-base-100/90 backdrop-blur border-t border-base-300 shadow-inner lg:hidden z-50 overflow-hidden">
+        <div className="flex justify-around py-1 items-center w-full">
           {menuItems.map((item) => (
             <Link
               key={item.name}
               to={item.path}
-              className={`flex flex-col items-center text-xs ${isActive(item.path)}`}
+              className={`flex flex-col items-center text-xs min-w-0 ${isActive(item.path)}`}
             >
               {item.icon}
-              <span>{item.name}</span>
+              <span className="text-[10px] truncate">{item.name}</span>
             </Link>
           ))}
 
           {isAuthenticated ? (
             <div className="dropdown dropdown-top">
-              <button tabIndex={0} className="flex flex-col items-center text-xs">
+              <button tabIndex={0} className="flex flex-col items-center text-xs min-w-0">
                 <User className="w-5 h-5" />
-                <span>Me</span>
+                <span className="text-[10px] truncate">Me</span>
               </button>
               <ul
                 tabIndex={0}
@@ -157,10 +157,10 @@ export const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className={`flex flex-col items-center text-xs ${isActive("/login")}`}
+              className={`flex flex-col items-center text-xs min-w-0 ${isActive("/login")}`}
             >
               <LogIn className="w-5 h-5" />
-              <span>Login</span>
+              <span className="text-[10px] truncate">Login</span>
             </Link>
           )}
         </div>
