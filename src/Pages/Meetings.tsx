@@ -9,7 +9,7 @@ import PuffLoader from "react-spinners/PuffLoader";
 import { useTheme } from "../ThemeContext";
 
 const MeetingList: React.FC = () => {
-  const { theme } = useTheme(); // Theme context
+  const { theme } = useTheme();
   const { data: meetings, isLoading, isError } = useGetAllMeetingsQuery({});
   const navigate = useNavigate();
 
@@ -39,9 +39,7 @@ const MeetingList: React.FC = () => {
   );
 
   const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
   return (
@@ -54,7 +52,7 @@ const MeetingList: React.FC = () => {
           color: theme["base-content"],
         }}
       >
-        {/* Hero / Page Header */}
+        {/* Page Header */}
         <motion.section
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -73,7 +71,7 @@ const MeetingList: React.FC = () => {
           </p>
         </motion.section>
 
-        {/* Search & Filter Controls */}
+        {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-6 lg:px-20 mb-8">
           <div className="relative w-full sm:w-1/2 lg:w-1/3">
             <Search
@@ -97,7 +95,6 @@ const MeetingList: React.FC = () => {
               }}
             />
           </div>
-
           <input
             type="date"
             value={filterDate}
@@ -131,7 +128,7 @@ const MeetingList: React.FC = () => {
             </div>
           )}
 
-          {paginatedMeetings && paginatedMeetings.length > 0 ? (
+          {paginatedMeetings.length > 0 ? (
             paginatedMeetings.map((meeting: any, index: number) => (
               <motion.div
                 key={meeting.id}
@@ -157,8 +154,10 @@ const MeetingList: React.FC = () => {
                     />
                     {meeting.title}
                   </h2>
-
-                  <p className="mb-4 flex items-center gap-2" style={{ color: theme["base-content"] + "CC" }}>
+                  <p
+                    className="mb-4 flex items-center gap-2"
+                    style={{ color: theme["base-content"] + "CC" }}
+                  >
                     <Calendar
                       className="w-4 h-4"
                       style={{ color: theme["base-content"] + "80" }}
@@ -194,13 +193,12 @@ const MeetingList: React.FC = () => {
           )}
         </main>
 
-        {/* Pagination Controls */}
+        {/* Pagination */}
         {!isLoading && filteredMeetings.length > 0 && (
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-6 lg:px-20 pb-12">
             <div className="flex items-center gap-2">
               <label style={{ color: theme["base-content"] + "CC" }}>Show:</label>
               <select
-                id="itemsPerPage"
                 value={itemsPerPage}
                 onChange={(e) => {
                   setItemsPerPage(Number(e.target.value));

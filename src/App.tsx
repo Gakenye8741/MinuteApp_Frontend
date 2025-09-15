@@ -14,6 +14,7 @@ import ManageSignatures from "./Dashboard/AdminDashboard/ManageSignatures";
 import ManageOfficials from "./Dashboard/AdminDashboard/ManageOfficials";
 import { ThemeProvider } from "./ThemeContext";
 import ThemeToggle from "./ThemeToggle";
+import MeetingDetailsPage from "./Pages/MeetingDetails";
 
 // Wrapper to extract meetingId from route params
 const ManageAttendeesWrapper = () => {
@@ -28,7 +29,7 @@ const App = () => {
     { path: "/about", element: <AboutPage /> },
     { path: "/login", element: <Login /> },
     { path: "/meetings", element: <Meetings /> },
-    { path: "/meetings/:id", element: <MeetingDetails /> },
+    { path: "/meetings/:id", element: <MeetingDetailsPage/> },
     {
       path: "/Admindashboard",
       element: (
