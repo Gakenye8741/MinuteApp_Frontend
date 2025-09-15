@@ -62,17 +62,17 @@ const MeetingDetailsPage: React.FC = () => {
           >
             <FileText className="w-6 h-6" /> {meeting.title}
           </h1>
-          <p className="flex items-center gap-2 mb-2">
+          <p className="flex items-center gap-2 mb-2" style={{ color: theme["base-content"] + "CC" }}>
             <Calendar className="w-5 h-5" /> {new Date(meeting.date).toLocaleString()}
           </p>
           {meeting.description && (
-            <p className="text-base-content/80">{meeting.description}</p>
+            <p style={{ color: theme["base-content"] + "AA" }}>{meeting.description}</p>
           )}
         </div>
 
         {/* Attendees */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
             <UserCheck className="w-5 h-5" /> Attendees
           </h2>
           {attendees && attendees.length > 0 ? (
@@ -80,20 +80,25 @@ const MeetingDetailsPage: React.FC = () => {
               {attendees.map((a: any) => (
                 <li
                   key={a.id}
-                  style={{ color: theme["base-content"] }}
+                  style={{
+                    color: theme["base-content"],
+                    backgroundColor: theme["base-200"],
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                  }}
                 >
                   {a.name} - {a.email} ({a.status})
                 </li>
               ))}
             </ul>
           ) : (
-            <p>No attendees found.</p>
+            <p style={{ color: theme["base-content"] + "88" }}>No attendees found.</p>
           )}
         </section>
 
         {/* Topics as collapsible dropdown */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
             <Book className="w-5 h-5" /> Topics
           </h2>
           {topics && topics.length > 0 ? (
@@ -104,7 +109,10 @@ const MeetingDetailsPage: React.FC = () => {
                   <div
                     key={t.id}
                     className="border rounded-lg shadow-sm overflow-hidden"
-                    style={{ borderColor: theme["base-300"], backgroundColor: theme["base-200"] }}
+                    style={{
+                      borderColor: theme["base-300"],
+                      backgroundColor: theme["base-200"],
+                    }}
                   >
                     <button
                       onClick={() =>
@@ -132,13 +140,13 @@ const MeetingDetailsPage: React.FC = () => {
               })}
             </div>
           ) : (
-            <p>No topics found.</p>
+            <p style={{ color: theme["base-content"] + "88" }}>No topics found.</p>
           )}
         </section>
 
         {/* Signatures */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
             <FileText className="w-5 h-5" /> Signatures
           </h2>
           {signatures && signatures.length > 0 ? (
@@ -151,7 +159,7 @@ const MeetingDetailsPage: React.FC = () => {
               ))}
             </ul>
           ) : (
-            <p>No signatures found.</p>
+            <p style={{ color: theme["base-content"] + "88" }}>No signatures found.</p>
           )}
         </section>
 
