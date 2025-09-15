@@ -51,7 +51,10 @@ export const Navbar = () => {
       {/* Desktop Navbar */}
       <div className="navbar fixed top-0 left-0 right-0 z-50 bg-base-100/90 backdrop-blur text-base-content shadow-sm border-b border-base-300 flex flex-wrap hidden lg:flex">
         <div className="navbar-start flex-1 min-w-0">
-          <Link to="/" className="btn btn-ghost text-xl font-bold leading-tight text-left whitespace-normal">
+          <Link
+            to="/"
+            className="btn btn-ghost text-xl font-bold leading-tight text-left whitespace-normal"
+          >
             Computing And Innovation <br /> Society of Laikipia University
           </Link>
         </div>
@@ -83,18 +86,26 @@ export const Navbar = () => {
                   <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
                 </div>
               </label>
-              <ul tabIndex={0} className="menu dropdown-content bg-base-100 shadow rounded-box w-52 mt-2 z-20">
-                <li>
-                  {role === "Chairman" || role === "Secretary General" ? (
-                    <Link to="/Admindashboard/AllMeetings" className="font-bold flex items-center gap-2">
+              <ul
+                tabIndex={0}
+                className="menu dropdown-content bg-base-100 shadow rounded-box w-52 mt-2 z-20"
+              >
+                {role === "Chairman" || role === "Secretary General" ? (
+                  <li>
+                    <Link
+                      to="/Admindashboard/AllMeetings"
+                      className="font-bold flex items-center gap-2"
+                    >
                       <UserCheck className="h-5 w-5" /> Admin Dashboard
                     </Link>
-                  ) : (
+                  </li>
+                ) : (
+                  <li>
                     <Link to="/dashboard" className="font-bold flex items-center gap-2">
                       <User className="h-5 w-5" /> User Dashboard
                     </Link>
-                  )}
-                </li>
+                  </li>
+                )}
                 <li>
                   <button onClick={handleLogout} className="flex items-center gap-2">
                     <LogOut className="h-5 w-5" /> Logout
@@ -124,15 +135,25 @@ export const Navbar = () => {
             </Link>
           ))}
 
+          {/* Theme Toggle */}
+          <button
+            className="flex flex-col items-center text-xs min-w-0"
+            onClick={toggleTheme}
+          >
+            {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            <span className="text-[10px] truncate">Theme</span>
+          </button>
+
+          {/* Auth / Me Dropdown */}
           {isAuthenticated ? (
-            <div className="dropdown dropdown-top">
+            <div className="dropdown dropdown-top dropdown-end">
               <button tabIndex={0} className="flex flex-col items-center text-xs min-w-0">
                 <User className="w-5 h-5" />
                 <span className="text-[10px] truncate">Me</span>
               </button>
               <ul
                 tabIndex={0}
-                className="menu dropdown-content bg-base-100 shadow rounded-box w-40 mt-1 right-0"
+                className="menu dropdown-content bg-base-100 shadow rounded-box mt-1 min-w-max p-2"
               >
                 {role === "Chairman" || role === "Secretary General" ? (
                   <li>
