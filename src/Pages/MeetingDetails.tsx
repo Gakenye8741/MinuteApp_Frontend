@@ -4,7 +4,8 @@ import { useTheme } from "../ThemeContext";
 import { Navbar } from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import PuffLoader from "react-spinners/PuffLoader";
-import { Calendar, FileText, UserCheck, Book, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
+import { Calendar, FileText, UserCheck, Book, ChevronDown, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 // API hooks
 import { useGetAllMeetingsQuery } from "../Features/Apis/meetingApis";
@@ -16,14 +17,12 @@ const MeetingDetailsPage: React.FC = () => {
   const { theme } = useTheme();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [openTopics, setOpenTopics] = useState<Set<number>>(new Set()); // Store multiple open topics
+  const [openTopics, setOpenTopics] = useState<Set<number>>(new Set()); // multiple topics open
 
-  // Fetch meeting
   const { data: meetings, isLoading: meetingLoading, isError: meetingError } =
     useGetAllMeetingsQuery({});
   const meeting = meetings?.find((m: any) => m.id === Number(id));
 
-  // Fetch attendees, topics, signatures
   const { data: attendees, isLoading: attendeesLoading } = useGetAllAttendeesQuery(id);
   const { data: topics, isLoading: topicsLoading } = useGetTopicsByMeetingIdQuery(id!);
   const { data: signatures, isLoading: signaturesLoading } = useGetSignaturesByMeetingIdQuery(Number(id));
@@ -38,30 +37,25 @@ const MeetingDetailsPage: React.FC = () => {
 
   if (meetingError || !meeting) {
     return (
-      <div
-        className="flex justify-center items-center h-screen text-center"
-        style={{ color: theme.error }}
-      >
+      <div className="flex justify-center items-center h-screen text-center" style={{ color: theme.error }}>
         <p>Meeting not found or an error occurred.</p>
       </div>
     );
   }
 
-  // Function to determine attendee status color
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "present":
-        return theme.secondary; // green
+        return theme.secondary;
       case "late":
-        return theme.accent; // red/orange
+        return theme.accent;
       case "absent":
-        return theme["neutral"]; // gray
+        return theme["neutral"];
       default:
         return theme["base-content"];
     }
   };
 
-  // Toggle topic open/close
   const toggleTopic = (id: number) => {
     const newSet = new Set(openTopics);
     if (newSet.has(id)) newSet.delete(id);
@@ -72,34 +66,26 @@ const MeetingDetailsPage: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div
-        className="min-h-screen pt-[5rem] lg:pt-[6rem] pb-[4.5rem] lg:pb-0 px-4 sm:px-6 lg:px-20"
-        style={{ backgroundColor: theme["base-100"], color: theme["base-content"] }}
-      >
-        {/* Go Back Button at Top */}
+      <div className="min-h-screen pt-[5rem] lg:pt-[6rem] pb-[4.5rem] lg:pb-0 px-4 sm:px-6 lg:px-20" style={{ backgroundColor: theme["base-100"], color: theme["base-content"] }}>
+        
+        {/* Go Back Button */}
         <button
           onClick={() => navigate(-1)}
           className="mb-6 flex items-center gap-2 btn btn-outline"
           style={{ borderColor: theme.primary, color: theme.primary }}
         >
-          <ArrowLeft className="w-4 h-4" />
-          Go Back
+          <ArrowLeft className="w-4 h-4" /> Go Back
         </button>
 
         {/* Meeting Header */}
         <div className="mb-8">
-          <h1
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 flex items-center gap-2"
-            style={{ color: theme.primary }}
-          >
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
             <FileText className="w-6 h-6" /> {meeting.title}
           </h1>
           <p className="flex items-center gap-2 mb-2" style={{ color: theme["base-content"] + "CC" }}>
             <Calendar className="w-5 h-5" /> {new Date(meeting.date).toLocaleString()}
           </p>
-          {meeting.description && (
-            <p style={{ color: theme["base-content"] + "AA" }}>{meeting.description}</p>
-          )}
+          {meeting.description && <p style={{ color: theme["base-content"] + "AA" }}>{meeting.description}</p>}
         </div>
 
         {/* Attendees */}
@@ -110,15 +96,7 @@ const MeetingDetailsPage: React.FC = () => {
           {attendees && attendees.length > 0 ? (
             <ul className="list-disc pl-5 space-y-1">
               {attendees.map((a: any) => (
-                <li
-                  key={a.id}
-                  style={{
-                    color: getStatusColor(a.status),
-                    backgroundColor: theme["base-200"],
-                    padding: "4px 8px",
-                    borderRadius: "4px",
-                  }}
-                >
+                <li key={a.id} style={{ color: getStatusColor(a.status), backgroundColor: theme["base-200"], padding: "4px 8px", borderRadius: "4px" }}>
                   {a.name} - {a.email} ({a.status})
                 </li>
               ))}
@@ -128,7 +106,7 @@ const MeetingDetailsPage: React.FC = () => {
           )}
         </section>
 
-        {/* Topics as collapsible dropdown (multiple open) */}
+        {/* Topics with Framer Motion */}
         <section className="mb-6">
           <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
             <Book className="w-5 h-5" /> Topics
@@ -138,33 +116,35 @@ const MeetingDetailsPage: React.FC = () => {
               {topics.map((t: any) => {
                 const isOpen = openTopics.has(t.id);
                 return (
-                  <div
-                    key={t.id}
-                    className="border rounded-lg shadow-sm overflow-hidden"
-                    style={{
-                      borderColor: theme["base-300"],
-                      backgroundColor: theme["base-200"],
-                    }}
-                  >
+                  <div key={t.id} className="border rounded-lg shadow-sm overflow-hidden" style={{ borderColor: theme["base-300"], backgroundColor: theme["base-200"] }}>
+                    
                     <button
                       onClick={() => toggleTopic(t.id)}
                       className="w-full px-4 py-2 flex justify-between items-center font-semibold"
                       style={{ color: theme["base-content"] }}
                     >
                       {t.subject}
-                      {isOpen ? (
-                        <ChevronUp className="w-4 h-4" />
-                      ) : (
+                      <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
                         <ChevronDown className="w-4 h-4" />
-                      )}
+                      </motion.span>
                     </button>
-                    {isOpen && (
-                      <div className="px-4 py-2 space-y-1 text-sm" style={{ color: theme["base-content"] }}>
-                        <p><strong>Notes:</strong> {t.notes}</p>
-                        <p><strong>Decisions:</strong> {t.decisions}</p>
-                        <p><strong>Actions:</strong> {t.actions}</p>
-                      </div>
-                    )}
+
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="px-4 py-2 space-y-1 text-sm"
+                          style={{ color: theme["base-content"] }}
+                        >
+                          <p><strong>Notes:</strong> {t.notes}</p>
+                          <p><strong>Decisions:</strong> {t.decisions}</p>
+                          <p><strong>Actions:</strong> {t.actions}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 );
               })}
