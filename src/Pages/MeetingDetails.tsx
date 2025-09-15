@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
 import { Navbar } from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import PuffLoader from "react-spinners/PuffLoader";
-import { Calendar, FileText, UserCheck, Book } from "lucide-react";
+import { Calendar, FileText, UserCheck, Book, ChevronDown, ChevronUp } from "lucide-react";
 
 // API hooks
 import { useGetAllMeetingsQuery } from "../Features/Apis/meetingApis";
@@ -16,6 +16,7 @@ const MeetingDetailsPage: React.FC = () => {
   const { theme } = useTheme();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [openTopicId, setOpenTopicId] = useState<number | null>(null);
 
   // Fetch meeting
   const { data: meetings, isLoading: meetingLoading, isError: meetingError } =
@@ -65,69 +66,92 @@ const MeetingDetailsPage: React.FC = () => {
             <Calendar className="w-5 h-5" /> {new Date(meeting.date).toLocaleString()}
           </p>
           {meeting.description && (
-            <p style={{ color: theme["base-content"] + "CC" }}>{meeting.description}</p>
+            <p className="text-base-content/80">{meeting.description}</p>
           )}
         </div>
 
         {/* Attendees */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
             <UserCheck className="w-5 h-5" /> Attendees
           </h2>
           {attendees && attendees.length > 0 ? (
-            <ul className="list-disc pl-5 space-y-1" style={{ color: theme["base-content"] }}>
+            <ul className="list-disc pl-5 space-y-1">
               {attendees.map((a: any) => (
-                <li key={a.id}>
+                <li
+                  key={a.id}
+                  style={{ color: theme["base-content"] }}
+                >
                   {a.name} - {a.email} ({a.status})
                 </li>
               ))}
             </ul>
           ) : (
-            <p style={{ color: theme["base-content"] + "80" }}>No attendees found.</p>
+            <p>No attendees found.</p>
           )}
         </section>
 
-        {/* Topics */}
+        {/* Topics as collapsible dropdown */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
             <Book className="w-5 h-5" /> Topics
           </h2>
           {topics && topics.length > 0 ? (
-            <ul className="list-decimal pl-5 space-y-1" style={{ color: theme["base-content"] }}>
-              {topics.map((t: any) => (
-                <li key={t.id}>
-                  <p className="font-semibold">{t.subject}</p>
-                  <p style={{ color: theme["base-content"] + "AA" }}>{t.notes}</p>
-                  {t.decisions && (
-                    <p style={{ color: theme["base-content"] + "AA" }}><strong>Decision:</strong> {t.decisions}</p>
-                  )}
-                  {t.actions && (
-                    <p style={{ color: theme["base-content"] + "AA" }}><strong>Action:</strong> {t.actions}</p>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <div className="space-y-2">
+              {topics.map((t: any) => {
+                const isOpen = openTopicId === t.id;
+                return (
+                  <div
+                    key={t.id}
+                    className="border rounded-lg shadow-sm overflow-hidden"
+                    style={{ borderColor: theme["base-300"], backgroundColor: theme["base-200"] }}
+                  >
+                    <button
+                      onClick={() =>
+                        setOpenTopicId(isOpen ? null : t.id)
+                      }
+                      className="w-full px-4 py-2 flex justify-between items-center font-semibold"
+                      style={{ color: theme["base-content"] }}
+                    >
+                      {t.subject}
+                      {isOpen ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
+                    {isOpen && (
+                      <div className="px-4 py-2 space-y-1 text-sm" style={{ color: theme["base-content"] }}>
+                        <p><strong>Notes:</strong> {t.notes}</p>
+                        <p><strong>Decisions:</strong> {t.decisions}</p>
+                        <p><strong>Actions:</strong> {t.actions}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           ) : (
-            <p style={{ color: theme["base-content"] + "80" }}>No topics found.</p>
+            <p>No topics found.</p>
           )}
         </section>
 
         {/* Signatures */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
             <FileText className="w-5 h-5" /> Signatures
           </h2>
           {signatures && signatures.length > 0 ? (
-            <ul className="list-disc pl-5 space-y-1" style={{ color: theme["base-content"] }}>
+            <ul className="list-disc pl-5 space-y-1">
               {signatures.map((s: any) => (
-                <li key={s.id}>
+                <li key={s.id} style={{ color: theme["base-content"] }}>
                   Signed By: <span style={{ fontWeight: 600 }}>{s.user.fullName}</span> on{" "}
                   {new Date(s.signedAt).toLocaleString()} ({s.role})
                 </li>
               ))}
             </ul>
           ) : (
-            <p style={{ color: theme["base-content"] + "80" }}>No signatures found.</p>
+            <p>No signatures found.</p>
           )}
         </section>
 
