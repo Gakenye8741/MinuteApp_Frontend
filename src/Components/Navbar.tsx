@@ -3,6 +3,8 @@ import {
   Home,
   FileQuestionMark,
   LogIn,
+  Sun,
+  Moon,
   ChevronDown,
   UserCheck,
   User,
@@ -37,14 +39,17 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
   const handleLogout = () => dispatch(clearCredentials());
 
+  // Returns styles for mobile tabs based on theme and active state
   const getMobileTabStyles = (path: string) => {
-    const active = location.pathname === path;
-    if (active) {
-      return isDark
+    const isActiveTab = location.pathname === path;
+    if (isDark) {
+      return isActiveTab
         ? "bg-white text-black rounded-lg"
-        : "bg-black text-white rounded-lg";
+        : "text-white";
     } else {
-      return isDark ? "text-white" : "text-black";
+      return isActiveTab
+        ? "bg-black text-white rounded-lg"
+        : "text-black";
     }
   };
 
@@ -76,9 +81,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
                 <Link
                   to={item.path}
                   className={`flex items-center gap-1 ${
-                    location.pathname === item.path
-                      ? `font-bold text-[${theme.primary}]`
-                      : `text-[${theme["base-content"]}]`
+                    location.pathname === item.path ? `font-bold text-[${theme.primary}]` : `text-[${theme["base-content"]}]`
                   }`}
                 >
                   {item.icon} {item.name}
@@ -109,10 +112,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
               >
                 {(role === "Chairman" || role === "Secretary General") ? (
                   <li>
-                    <Link
-                      to="/Admindashboard/AllMeetings"
-                      className="font-bold flex items-center gap-2"
-                    >
+                    <Link to="/Admindashboard/AllMeetings" className="font-bold flex items-center gap-2">
                       <UserCheck className="h-5 w-5" /> Admin Dashboard
                     </Link>
                   </li>
@@ -124,10 +124,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
                   </li>
                 )}
                 <li>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 w-full text-left"
-                  >
+                  <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left">
                     <LogOut className="h-5 w-5" /> Logout
                   </button>
                 </li>
@@ -147,17 +144,17 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
       {/* Mobile Bottom Navbar */}
       <div
-        className="fixed bottom-0 left-0 w-full flex justify-around py-2 items-center lg:hidden shadow-inner z-50 border-t rounded-t-xl"
+        className="fixed bottom-0 left-0 w-full flex justify-around py-2 items-center lg:hidden shadow-inner z-50 border-t"
         style={{
-          backgroundColor: isDark ? "#1f1f1f" : "#f3f4f6",
-          borderColor: isDark ? "#333" : "#d1d5db",
+          backgroundColor: isDark ? "#111" : "#fff",
+          color: isDark ? "#fff" : "#000",
         }}
       >
         {menuItems.map((item) => (
           <Link
             key={item.name}
             to={item.path}
-            className={`flex flex-col items-center text-xs min-w-0 p-2 transition hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)] ${getMobileTabStyles(item.path)}`}
+            className={`flex flex-col items-center text-xs min-w-0 p-2 transition ${getMobileTabStyles(item.path)}`}
           >
             {item.icon}
             <span className="text-[10px] truncate">{item.name}</span>
@@ -165,16 +162,16 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         ))}
 
         {/* Theme Toggle */}
-        <div className="p-2 rounded-lg hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]">
+        <div className={`p-2 transition ${getMobileTabStyles("/theme")}`}>
           <ThemeToggle />
         </div>
 
         {/* Auth / Me Dropdown */}
         {isAuthenticated ? (
-          <div className="dropdown dropdown-top dropdown-end relative z-[9999]">
+          <div className={`dropdown dropdown-top dropdown-end relative z-[9999] ${getMobileTabStyles("/me")}`}>
             <button
               tabIndex={0}
-              className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)] ${getMobileTabStyles("/me")}`}
+              className={`flex flex-col items-center text-xs min-w-0 p-2 transition`}
             >
               <User className="w-5 h-5" />
               <span className="text-[10px] truncate">Me</span>
@@ -182,7 +179,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
             <ul
               tabIndex={0}
               className="menu dropdown-content shadow rounded-box mt-1 min-w-max p-2"
-              style={{ backgroundColor: theme["base-100"], color: theme["base-content"] }}
+              style={{ backgroundColor: isDark ? "#111" : "#fff", color: isDark ? "#fff" : "#000" }}
             >
               {(role === "Chairman" || role === "Secretary General") ? (
                 <li>
@@ -207,7 +204,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         ) : (
           <Link
             to="/login"
-            className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)] text-black`}
+            className={`flex flex-col items-center text-xs min-w-0 p-2 transition ${getMobileTabStyles("/login")}`}
           >
             <LogIn className="w-5 h-5" />
             <span className="text-[10px] truncate">Login</span>
