@@ -31,7 +31,8 @@ export const Navbar = () => {
     { name: "Meetings", path: "/Meetings", icon: <BookAIcon className="w-5 h-5" /> },
   ];
 
-  const isActive = (path: string) => (location.pathname === path ? "text-primary font-bold" : "text-gray-500");
+  const isActive = (path: string) =>
+    location.pathname === path ? "text-primary font-bold" : "text-gray-500";
 
   const handleLogout = () => {
     dispatch(clearCredentials());
@@ -111,7 +112,7 @@ export const Navbar = () => {
 
       {/* Mobile Bottom Navbar */}
       <div className="fixed bottom-0 left-0 w-full bg-base-100/90 backdrop-blur border-t border-base-300 shadow-inner lg:hidden z-50">
-        <div className="flex justify-around py-2">
+        <div className="flex justify-around py-2 items-center">
           {menuItems.map((item) => (
             <Link
               key={item.name}
@@ -123,7 +124,37 @@ export const Navbar = () => {
             </Link>
           ))}
 
-          {!isAuthenticated && (
+          {isAuthenticated ? (
+            <div className="dropdown dropdown-top">
+              <button tabIndex={0} className="flex flex-col items-center text-xs">
+                <User className="w-5 h-5" />
+                <span>Me</span>
+              </button>
+              <ul
+                tabIndex={0}
+                className="menu dropdown-content bg-base-100 shadow rounded-box w-40 mt-1 right-0"
+              >
+                {role === "Chairman" || role === "Secretary General" ? (
+                  <li>
+                    <Link to="/Admindashboard/AllMeetings" className="flex items-center gap-2">
+                      <UserCheck className="w-4 h-4" /> Admin Dashboard
+                    </Link>
+                  </li>
+                ) : (
+                  <li>
+                    <Link to="/dashboard" className="flex items-center gap-2">
+                      <User className="w-4 h-4" /> User Dashboard
+                    </Link>
+                  </li>
+                )}
+                <li>
+                  <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left">
+                    <LogOut className="w-4 h-4" /> Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          ) : (
             <Link
               to="/login"
               className={`flex flex-col items-center text-xs ${isActive("/login")}`}
