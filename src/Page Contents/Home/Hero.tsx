@@ -32,7 +32,7 @@ const HeroSection: React.FC = () => {
             className="text-4xl lg:text-5xl font-bold mb-4"
             style={{ color: theme.primary }}
           >
-            Join the Computing & Innovation Society
+            Join the Computing & Innovation Society of Laikipia University
           </h1>
           
           {/* Club Motto */}
