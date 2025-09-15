@@ -21,7 +21,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ children }) => {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -38,6 +38,17 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
   ];
 
   const handleLogout = () => dispatch(clearCredentials());
+
+  // Helper for dynamic tab styles
+  const getTabClasses = (active: boolean) => {
+    if (active) {
+      return "rounded-lg bg-black text-white";
+    } else {
+      return isDark
+        ? "bg-white text-black hover:bg-gray-300 active:bg-gray-400"
+        : "bg-black text-white hover:bg-gray-800 active:bg-gray-900";
+    }
+  };
 
   return (
     <>
@@ -148,20 +159,16 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
             <Link
               key={item.name}
               to={item.path}
-              className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition ${
-                active
-                  ? "bg-black text-white"
-                  : "text-black hover:bg-gray-200 active:bg-gray-300"
-              }`}
+              className={`flex flex-col items-center text-xs min-w-0 p-2 transition ${getTabClasses(active)}`}
             >
-              {React.cloneElement(item.icon, { className: `w-5 h-5 ${active ? "text-white" : "text-black"}` })}
+              {React.cloneElement(item.icon, { className: `w-5 h-5 ${active ? "text-white" : isDark ? "text-black" : "text-white"}` })}
               <span className="text-[10px] truncate">{item.name}</span>
             </Link>
           );
         })}
 
         {/* Single Theme Toggle */}
-        <div className="p-2 rounded-lg hover:bg-gray-200 active:bg-gray-300">
+        <div className={`p-2 rounded-lg transition ${isDark ? "hover:bg-gray-300 active:bg-gray-400" : "hover:bg-gray-200 active:bg-gray-300"}`}>
           <ThemeToggle />
         </div>
 
@@ -170,9 +177,9 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           <div className="dropdown dropdown-top dropdown-end relative z-[9999]">
             <button
               tabIndex={0}
-              className="flex flex-col items-center text-xs min-w-0 p-2 rounded-lg hover:bg-gray-200 active:bg-gray-300"
+              className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition ${getTabClasses(location.pathname.includes("dashboard") || location.pathname.includes("Admindashboard"))}`}
             >
-              <User className="w-5 h-5" />
+              <User className={`w-5 h-5 ${isDark ? "text-black" : "text-white"}`} />
               <span className="text-[10px] truncate">Me</span>
             </button>
             <ul
@@ -203,9 +210,9 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         ) : (
           <Link
             to="/login"
-            className="flex flex-col items-center text-xs min-w-0 p-2 rounded-lg text-black hover:bg-gray-200 active:bg-gray-300"
+            className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition ${getTabClasses(location.pathname === "/login")}`}
           >
-            <LogIn className="w-5 h-5" />
+            <LogIn className={`w-5 h-5 ${isDark ? "text-black" : "text-white"}`} />
             <span className="text-[10px] truncate">Login</span>
           </Link>
         )}
