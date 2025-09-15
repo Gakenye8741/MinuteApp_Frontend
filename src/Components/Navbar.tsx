@@ -35,8 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
     { name: "Meetings", path: "/Meetings", icon: <BookAIcon className="w-5 h-5" /> },
   ];
 
-  const isActive = (path: string) =>
-    location.pathname === path ? "font-bold" : "";
+  const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = () => {
     dispatch(clearCredentials());
@@ -48,7 +47,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
       <div
         className="navbar fixed top-0 left-0 right-0 z-50 hidden lg:flex shadow-sm border-b"
         style={{
-          backgroundColor: theme["base-100"] + "e6",
+          backgroundColor: theme["base-100"],
           color: theme["base-content"],
           borderColor: theme["base-200"],
         }}
@@ -71,7 +70,11 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
               <li key={item.name}>
                 <Link
                   to={item.path}
-                  className={`flex items-center gap-1 ${isActive(item.path)}`}
+                  className="flex items-center gap-1"
+                  style={{
+                    fontWeight: isActive(item.path) ? "bold" : "normal",
+                    color: theme["base-content"],
+                  }}
                 >
                   {item.icon} {item.name}
                 </Link>
@@ -144,25 +147,37 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           <Link
             key={item.name}
             to={item.path}
-            className={`flex flex-col items-center text-xs py-2 flex-1 transition-colors duration-150 ${
-              isActive(item.path) ? "font-bold" : ""
-            } hover:bg-[${theme["base-200"]}] active:bg-[${theme["base-300"]}]`}
+            className="flex flex-col items-center text-xs py-2 flex-1 rounded-md transition-colors duration-150"
+            style={{
+              backgroundColor: isActive(item.path) ? theme.primary : "transparent",
+              color: isActive(item.path) ? theme["base-100"] : theme["base-content"],
+            }}
           >
             {item.icon}
             <span className="text-[10px] truncate">{item.name}</span>
           </Link>
         ))}
 
-        {/* Theme Toggle (only once here on mobile) */}
-        <div className="flex flex-col items-center text-xs py-2 flex-1">
+        {/* Theme Toggle */}
+        <div
+          className="flex flex-col items-center text-xs py-2 flex-1 rounded-md transition-colors duration-150"
+          style={{
+            backgroundColor: "transparent",
+            color: theme["base-content"],
+          }}
+        >
           <ThemeToggle />
           <span className="text-[10px] truncate">Theme</span>
         </div>
 
         {/* Auth Section */}
         {isAuthenticated ? (
-          <div className="dropdown dropdown-top dropdown-end">
-            <button tabIndex={0} className="flex flex-col items-center text-xs py-2 flex-1">
+          <div className="dropdown dropdown-top dropdown-end flex-1">
+            <button
+              tabIndex={0}
+              className="flex flex-col items-center text-xs py-2 w-full rounded-md"
+              style={{ color: theme["base-content"] }}
+            >
               <User className="w-5 h-5" />
               <span className="text-[10px] truncate">Me</span>
             </button>
@@ -194,7 +209,8 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         ) : (
           <Link
             to="/login"
-            className="flex flex-col items-center text-xs py-2 flex-1"
+            className="flex flex-col items-center text-xs py-2 flex-1 rounded-md"
+            style={{ color: theme["base-content"] }}
           >
             <LogIn className="w-5 h-5" />
             <span className="text-[10px] truncate">Login</span>
