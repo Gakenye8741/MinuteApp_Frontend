@@ -1,57 +1,33 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-import heroImage from "../assets/computer-laptop-macbook-coding.jpg"; // Replace with an appropriate club image
+import heroImage from "../assets/computer-laptop-macbook-coding.jpg";
 import Footer from "../Components/Footer";
 import { Navbar } from "../Components/Navbar";
 
-// Leadership data (only the three you provided)
+// Leadership data
 const keyLeaders = [
-  {
-    name: "Caleb Ogeto",
-    role: "Chairperson",
-    course: "Software Engineering",
-    image: "/images/caleb.jpg", // Replace with actual image path
-  },
-  {
-    name: "Gakenye Ndiritu",
-    role: "Secretary General",
-    course: "Information Systems",
-    image: "/images/gakenye.jpg",
-  },
-  {
-    name: "Miuli Muthui",
-    role: "Treasurer",
-    course: "Information Technology",
-    image: "/images/miuli.jpg",
-  },
+  { name: "Caleb Ogeto", role: "Chairperson", course: "Software Engineering", image: "/images/caleb.jpg" },
+  { name: "Gakenye Ndiritu", role: "Secretary General", course: "Information Systems", image: "/images/gakenye.jpg" },
+  { name: "Miuli Muthui", role: "Treasurer", course: "Information Technology", image: "/images/miuli.jpg" },
 ];
 
 // Activities data
 const activities = [
-  {
-    title: "Workshops & Training",
-    desc: "Enhance coding, AI, and design skills through hands-on sessions.",
-  },
-  {
-    title: "Hackathons & Competitions",
-    desc: "Participate in coding contests and showcase your technical talent.",
-  },
-  {
-    title: "Innovation Projects",
-    desc: "Collaborate on real-world projects that solve community challenges.",
-  },
-  {
-    title: "Networking & Mentorship",
-    desc: "Connect with tech professionals, alumni, and like-minded peers.",
-  },
+  { title: "Workshops & Training", desc: "Enhance coding, AI, and design skills through hands-on sessions." },
+  { title: "Hackathons & Competitions", desc: "Participate in coding contests and showcase your technical talent." },
+  { title: "Innovation Projects", desc: "Collaborate on real-world projects that solve community challenges." },
+  { title: "Networking & Mentorship", desc: "Connect with tech professionals, alumni, and like-minded peers." },
 ];
 
 const AboutPage: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div className="font-sans bg-base-100 text-secondary">
+      <div className="font-sans bg-base-100 text-secondary 
+                      pt-[4.5rem] lg:pt-[5rem] pb-[4.5rem] lg:pb-0">
+        {/* Desktop: padding-top 5rem (navbar height) */}
+        {/* Mobile: padding-bottom 4.5rem (bottom navbar height) */}
 
         {/* Hero Section */}
         <section className="py-12 px-4 sm:py-16 sm:px-6 lg:px-20 flex flex-col-reverse lg:flex-row items-center gap-10">
@@ -69,7 +45,6 @@ const AboutPage: React.FC = () => {
               Become a Member
             </Link>
           </div>
-
           <div className="flex-1 flex justify-center lg:justify-end">
             <img
               src={heroImage}
@@ -90,12 +65,11 @@ const AboutPage: React.FC = () => {
           </p>
         </section>
 
-        {/* Leadership Section (only the three key leaders) */}
+        {/* Leadership Section */}
         <section className="py-10 px-4 sm:py-12 sm:px-6 lg:px-20 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-6 sm:mb-8">
             Leadership Team
           </h2>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-center">
             {keyLeaders.map((leader, idx) => (
               <div
@@ -115,11 +89,9 @@ const AboutPage: React.FC = () => {
               </div>
             ))}
           </div>
-
-          {/* More Leaders Button */}
           <div className="mt-6">
             <a
-              href="/leaders" // Link to full leadership page or modal
+              href="/leaders"
               className="btn btn-outline btn-primary px-6 py-2 sm:px-8 sm:py-3 text-base sm:text-lg font-semibold"
             >
               More Leaders
@@ -165,7 +137,6 @@ const AboutPage: React.FC = () => {
 
         {/* Footer */}
         <Footer />
-
       </div>
     </>
   );

@@ -16,7 +16,6 @@ const MeetingList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6); // default 6 meetings per page
 
-  // Filter meetings by name or date
   const filteredMeetings = useMemo(() => {
     if (!meetings) return [];
     return meetings.filter((meeting: any) => {
@@ -30,7 +29,6 @@ const MeetingList: React.FC = () => {
     });
   }, [meetings, search, filterDate]);
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredMeetings.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedMeetings = filteredMeetings.slice(
@@ -38,7 +36,6 @@ const MeetingList: React.FC = () => {
     startIndex + itemsPerPage
   );
 
-  // Handle page change
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
@@ -48,7 +45,8 @@ const MeetingList: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div className="font-sans bg-base-100 text-secondary min-h-screen">
+      {/* Add padding-top for fixed desktop navbar & padding-bottom for mobile bottom navbar */}
+      <div className="font-sans bg-base-100 text-secondary min-h-screen pt-[5rem] lg:pt-[6rem] pb-[4.5rem] lg:pb-0">
         {/* Hero / Page Header */}
         <motion.section
           initial={{ opacity: 0, y: -20 }}
@@ -76,7 +74,7 @@ const MeetingList: React.FC = () => {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                setCurrentPage(1); // reset pagination
+                setCurrentPage(1);
               }}
               className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
             />
@@ -88,7 +86,7 @@ const MeetingList: React.FC = () => {
             value={filterDate}
             onChange={(e) => {
               setFilterDate(e.target.value);
-              setCurrentPage(1); // reset pagination
+              setCurrentPage(1);
             }}
             className="w-full sm:w-1/3 lg:w-1/4 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
           />
@@ -162,7 +160,7 @@ const MeetingList: React.FC = () => {
                 value={itemsPerPage}
                 onChange={(e) => {
                   setItemsPerPage(Number(e.target.value));
-                  setCurrentPage(1); // reset to first page
+                  setCurrentPage(1);
                 }}
                 className="border rounded-lg px-3 py-1 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none"
               >

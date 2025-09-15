@@ -7,14 +7,13 @@ import { useGetSignaturesByMeetingIdQuery } from "../Features/Apis/SignaturesApi
 import { Navbar } from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { motion } from "framer-motion";
-import { Users, BookOpen, PenTool } from "lucide-react";
+import { Users, BookOpen, PenTool, ChevronLeft } from "lucide-react";
 import PuffLoader from "react-spinners/PuffLoader";
 
 const MeetingDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const meetingId = id ? Number(id) : undefined;
 
-  // Queries
   const { data: meeting, isLoading: loadingMeeting } = useGetMeetingByIdQuery(id!);
   const { data: attendees } = useGetAllAttendeesQuery(meetingId ? String(meetingId) : undefined);
   const { data: topics } = useGetTopicsByMeetingIdQuery(id!);
@@ -31,21 +30,22 @@ const MeetingDetails: React.FC = () => {
     return <div className="text-center py-10 text-red-500">Meeting not found.</div>;
 
   return (
-    <div className="font-sans bg-base-100 text-secondary min-h-screen">
+    <div className="font-sans bg-base-100 text-secondary min-h-screen pt-[6rem] lg:pt-[6rem] pb-[4.5rem] lg:pb-0">
       <Navbar />
 
-      <main className="pt-20 px-4 sm:px-6 lg:px-20 max-w-5xl mx-auto space-y-10">
+      <main className="px-4 sm:px-6 lg:px-20 max-w-5xl mx-auto space-y-10">
         {/* Back Button */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
+          className="mb-4"
         >
           <Link
             to="/meetings"
-            className="text-primary hover:underline font-medium inline-block"
+            className="inline-flex items-center gap-2 text-primary font-medium bg-base-200 hover:bg-base-300 transition-colors px-4 py-2 rounded-lg shadow-sm"
           >
-            ← Back to Meetings
+            <ChevronLeft className="w-5 h-5" /> Back to Meetings
           </Link>
         </motion.div>
 
@@ -113,7 +113,7 @@ const MeetingDetails: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 + index * 0.15, duration: 0.5 }}
-                  className="bg-base p-4 rounded-xl border border-text-primary shadow-sm hover:shadow-md"
+                  className="bg-base-200 p-4 rounded-xl border border-text-primary shadow-sm hover:shadow-md"
                 >
                   <h3 className="text-xl font-medium text-primary mb-2">
                     {topic.subject}
@@ -178,7 +178,6 @@ const MeetingDetails: React.FC = () => {
   );
 };
 
-// Helper function for attendance status color
 const getStatusColor = (status: string) => {
   switch (status) {
     case "Present":
