@@ -3,13 +3,11 @@ import {
   Home,
   FileQuestionMark,
   LogIn,
-  Sun,
-  Moon,
-  ChevronDown,
-  UserCheck,
   User,
+  UserCheck,
   LogOut,
   Book,
+  ChevronDown,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -27,7 +25,9 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
   const dispatch = useDispatch();
   const location = useLocation();
 
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated
+  );
   const role = useSelector((state: RootState) => state.auth.role);
   const username = useSelector((state: RootState) => state.auth.user?.username);
 
@@ -36,9 +36,6 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
     { name: "About", path: "/about", icon: <FileQuestionMark className="w-5 h-5" /> },
     { name: "Meetings", path: "/meetings", icon: <Book className="w-5 h-5" /> },
   ];
-
-  const isActive = (path: string) =>
-    location.pathname === path ? `font-bold text-[${theme.primary}]` : `text-[${theme["base-content"]}]`;
 
   const handleLogout = () => dispatch(clearCredentials());
 
@@ -65,13 +62,21 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
         <div className="navbar-center flex-1 min-w-0">
           <ul className="menu menu-horizontal px-1 flex-1 flex-wrap">
-            {menuItems.map((item) => (
-              <li key={item.name}>
-                <Link to={item.path} className={`flex items-center gap-1 ${isActive(item.path)}`}>
-                  {item.icon} {item.name}
-                </Link>
-              </li>
-            ))}
+            {menuItems.map((item) => {
+              const active = location.pathname === item.path;
+              return (
+                <li key={item.name}>
+                  <Link
+                    to={item.path}
+                    className={`flex items-center gap-1 font-semibold ${
+                      active ? `text-[${theme.primary}]` : `text-[${theme["base-content"]}]`
+                    }`}
+                  >
+                    {item.icon} {item.name}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
@@ -137,21 +142,26 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         className="fixed bottom-0 left-0 w-full flex justify-around py-2 items-center lg:hidden shadow-inner z-50 border-t"
         style={{ backgroundColor: theme["base-100"], borderColor: theme["base-200"] }}
       >
-        {menuItems.map((item) => (
-          <Link
-            key={item.name}
-            to={item.path}
-            className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition 
-              ${isActive(item.path)} 
-              hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]`}
-          >
-            {item.icon}
-            <span className="text-[10px] truncate">{item.name}</span>
-          </Link>
-        ))}
+        {menuItems.map((item) => {
+          const active = location.pathname === item.path;
+          return (
+            <Link
+              key={item.name}
+              to={item.path}
+              className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition ${
+                active
+                  ? "bg-black text-white"
+                  : "text-black hover:bg-gray-200 active:bg-gray-300"
+              }`}
+            >
+              {React.cloneElement(item.icon, { className: `w-5 h-5 ${active ? "text-white" : "text-black"}` })}
+              <span className="text-[10px] truncate">{item.name}</span>
+            </Link>
+          );
+        })}
 
         {/* Single Theme Toggle */}
-        <div className="p-2 rounded-lg hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]">
+        <div className="p-2 rounded-lg hover:bg-gray-200 active:bg-gray-300">
           <ThemeToggle />
         </div>
 
@@ -160,7 +170,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           <div className="dropdown dropdown-top dropdown-end relative z-[9999]">
             <button
               tabIndex={0}
-              className="flex flex-col items-center text-xs min-w-0 p-2 rounded-lg hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]"
+              className="flex flex-col items-center text-xs min-w-0 p-2 rounded-lg hover:bg-gray-200 active:bg-gray-300"
             >
               <User className="w-5 h-5" />
               <span className="text-[10px] truncate">Me</span>
@@ -193,10 +203,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         ) : (
           <Link
             to="/login"
-            className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition
-              ${isActive("/login")}
-              hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]`}
-            style={{ color: theme["base-content"] }}
+            className="flex flex-col items-center text-xs min-w-0 p-2 rounded-lg text-black hover:bg-gray-200 active:bg-gray-300"
           >
             <LogIn className="w-5 h-5" />
             <span className="text-[10px] truncate">Login</span>
