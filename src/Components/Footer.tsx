@@ -1,6 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaTwitter, FaLinkedin, FaFacebook, FaInstagram } from "react-icons/fa";
+import { Home, FileQuestionMark, BookAIcon } from "lucide-react";
+
+
+const menuItems = [
+  { name: "Home", path: "/", icon: <Home className="w-5 h-5 inline mr-2" /> },
+  { name: "About", path: "/About", icon: <FileQuestionMark className="w-5 h-5 inline mr-2" /> },
+  { name: "Meetings", path: "/Meetings", icon: <BookAIcon className="w-5 h-5 inline mr-2" /> },
+];
 
 const Footer: React.FC = () => {
   return (
@@ -18,17 +26,28 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Navigation Links */}
-        <div className="flex-1 flex flex-col sm:flex-row justify-center gap-6">
-          <Link to="/" className="hover:text-primary transition">Home</Link>
-          <Link to="/minutes" className="hover:text-primary transition">Minutes</Link>
-          <Link to="/about" className="hover:text-primary transition">About</Link>
-          <Link to="/contact" className="hover:text-primary transition">Contact</Link>
+        <div className="flex-1 flex flex-col sm:flex-row justify-center gap-6 flex-wrap">
+          {menuItems.map((item) => (
+            <Link
+              key={item.name}
+              to={item.path}
+              className="hover:text-primary transition flex items-center gap-1"
+            >
+              {item.icon} {item.name}
+            </Link>
+          ))}
         </div>
 
         {/* Contact / Social */}
         <div className="flex-1 flex flex-col items-start sm:items-end gap-3">
           <p className="text-sm">
-            Contact: <a href="mailto:info@computinginnovation.lu" className="hover:text-primary transition">info@computinginnovation.lu</a>
+            Contact:{" "}
+            <a
+              href="mailto:info@computinginnovation.lu"
+              className="hover:text-primary transition"
+            >
+              info@computinginnovation.lu
+            </a>
           </p>
           <div className="flex gap-4 mt-2 text-xl text-primary">
             <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition">
