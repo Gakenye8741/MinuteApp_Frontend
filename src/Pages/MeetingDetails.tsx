@@ -17,10 +17,9 @@ const MeetingDetailsPage: React.FC = () => {
   const { theme } = useTheme();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [openTopics, setOpenTopics] = useState<Set<number>>(new Set()); // multiple topics open
+  const [openTopics, setOpenTopics] = useState<Set<number>>(new Set());
 
-  const { data: meetings, isLoading: meetingLoading, isError: meetingError } =
-    useGetAllMeetingsQuery({});
+  const { data: meetings, isLoading: meetingLoading, isError: meetingError } = useGetAllMeetingsQuery({});
   const meeting = meetings?.find((m: any) => m.id === Number(id));
 
   const { data: attendees, isLoading: attendeesLoading } = useGetAllAttendeesQuery(id);
@@ -69,16 +68,18 @@ const MeetingDetailsPage: React.FC = () => {
       <div className="min-h-screen pt-[5rem] lg:pt-[6rem] pb-[4.5rem] lg:pb-0 px-4 sm:px-6 lg:px-20" style={{ backgroundColor: theme["base-100"], color: theme["base-content"] }}>
         
         {/* Go Back Button */}
-        <button
+        <motion.button
           onClick={() => navigate(-1)}
           className="mb-6 flex items-center gap-2 btn btn-outline"
           style={{ borderColor: theme.primary, color: theme.primary }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           <ArrowLeft className="w-4 h-4" /> Go Back
-        </button>
+        </motion.button>
 
         {/* Meeting Header */}
-        <div className="mb-8">
+        <motion.div className="mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
             <FileText className="w-6 h-6" /> {meeting.title}
           </h1>
@@ -86,7 +87,7 @@ const MeetingDetailsPage: React.FC = () => {
             <Calendar className="w-5 h-5" /> {new Date(meeting.date).toLocaleString()}
           </p>
           {meeting.description && <p style={{ color: theme["base-content"] + "AA" }}>{meeting.description}</p>}
-        </div>
+        </motion.div>
 
         {/* Attendees */}
         <section className="mb-6">
@@ -94,13 +95,24 @@ const MeetingDetailsPage: React.FC = () => {
             <UserCheck className="w-5 h-5" /> Attendees
           </h2>
           {attendees && attendees.length > 0 ? (
-            <ul className="list-disc pl-5 space-y-1">
+            <motion.ul
+              className="list-disc pl-5 space-y-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
               {attendees.map((a: any) => (
-                <li key={a.id} style={{ color: getStatusColor(a.status), backgroundColor: theme["base-200"], padding: "4px 8px", borderRadius: "4px" }}>
+                <motion.li
+                  key={a.id}
+                  style={{ color: getStatusColor(a.status), backgroundColor: theme["base-200"], padding: "4px 8px", borderRadius: "4px" }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 * a.id }}
+                >
                   {a.name} - {a.email} ({a.status})
-                </li>
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
           ) : (
             <p style={{ color: theme["base-content"] + "88" }}>No attendees found.</p>
           )}
@@ -116,18 +128,24 @@ const MeetingDetailsPage: React.FC = () => {
               {topics.map((t: any) => {
                 const isOpen = openTopics.has(t.id);
                 return (
-                  <div key={t.id} className="border rounded-lg shadow-sm overflow-hidden" style={{ borderColor: theme["base-300"], backgroundColor: theme["base-200"] }}>
-                    
-                    <button
+                  <motion.div
+                    key={t.id}
+                    className="border rounded-lg shadow-sm overflow-hidden"
+                    style={{ borderColor: theme["base-300"], backgroundColor: theme["base-200"] }}
+                    layout
+                  >
+                    <motion.button
                       onClick={() => toggleTopic(t.id)}
                       className="w-full px-4 py-2 flex justify-between items-center font-semibold"
                       style={{ color: theme["base-content"] }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
                     >
                       {t.subject}
-                      <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
+                      <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.4 }}>
                         <ChevronDown className="w-4 h-4" />
                       </motion.span>
-                    </button>
+                    </motion.button>
 
                     <AnimatePresence initial={false}>
                       {isOpen && (
@@ -135,7 +153,7 @@ const MeetingDetailsPage: React.FC = () => {
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
+                          transition={{ duration: 0.4 }}
                           className="px-4 py-2 space-y-1 text-sm"
                           style={{ color: theme["base-content"] }}
                         >
@@ -145,7 +163,7 @@ const MeetingDetailsPage: React.FC = () => {
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -160,14 +178,24 @@ const MeetingDetailsPage: React.FC = () => {
             <FileText className="w-5 h-5" /> Signatures
           </h2>
           {signatures && signatures.length > 0 ? (
-            <ul className="list-disc pl-5 space-y-1">
+            <motion.ul
+              className="list-disc pl-5 space-y-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
               {signatures.map((s: any) => (
-                <li key={s.id} style={{ color: theme["base-content"] }}>
-                  Signed By: <span style={{ fontWeight: 600 }}>{s.user.fullName}</span> on{" "}
-                  {new Date(s.signedAt).toLocaleString()} ({s.role})
-                </li>
+                <motion.li
+                  key={s.id}
+                  style={{ color: theme["base-content"] }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 * s.id }}
+                >
+                  Signed By: <span style={{ fontWeight: 600 }}>{s.user.fullName}</span> on {new Date(s.signedAt).toLocaleString()} ({s.role})
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
           ) : (
             <p style={{ color: theme["base-content"] + "88" }}>No signatures found.</p>
           )}
