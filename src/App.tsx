@@ -53,7 +53,7 @@ const App = () => {
     <ThemeProvider>
       <div className="app">
         {/* Place toggle anywhere, for example top-right corner */}
-        <ThemeToggle />
+       
         <RouterProvider router={router} />
       </div>
     </ThemeProvider>
