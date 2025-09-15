@@ -3,8 +3,6 @@ import {
   Home,
   FileQuestionMark,
   LogIn,
-  Sun,
-  Moon,
   ChevronDown,
   UserCheck,
   User,
@@ -19,11 +17,11 @@ import type { RootState } from "../App/store";
 import ThemeToggle from "../ThemeToggle";
 
 interface NavbarProps {
-  children?: ReactNode; // <- add children support
+  children?: ReactNode;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ children }) => {
-  const { theme, toggleTheme, isDark } = useTheme(); // Global theme
+  const { theme } = useTheme();
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -38,9 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
   ];
 
   const isActive = (path: string) =>
-    location.pathname === path
-      ? `font-bold ${theme.primary}`
-      : theme["base-content"];
+    location.pathname === path ? "font-bold" : "";
 
   const handleLogout = () => {
     dispatch(clearCredentials());
@@ -48,17 +44,17 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
   return (
     <>
-      {/* Desktop Navbar */}
+      {/* Desktop Navbar (hidden on small screens) */}
       <div
-        className="navbar fixed top-0 left-0 right-0 z-50 flex flex-wrap hidden lg:flex shadow-sm border-b"
+        className="navbar fixed top-0 left-0 right-0 z-50 hidden lg:flex shadow-sm border-b"
         style={{
-          backgroundColor: theme["base-100"] + "e6", // slightly transparent
+          backgroundColor: theme["base-100"] + "e6",
           color: theme["base-content"],
           borderColor: theme["base-200"],
         }}
       >
         {/* Left */}
-        <div className="navbar-start flex-1 min-w-0">
+        <div className="navbar-start flex-1">
           <Link
             to="/"
             className="btn btn-ghost text-xl font-bold leading-tight text-left whitespace-normal"
@@ -69,8 +65,8 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         </div>
 
         {/* Center */}
-        <div className="navbar-center flex-1 min-w-0">
-          <ul className="menu menu-horizontal px-1 flex-1 flex-wrap">
+        <div className="navbar-center flex-1">
+          <ul className="menu menu-horizontal px-1">
             {menuItems.map((item) => (
               <li key={item.name}>
                 <Link
@@ -85,21 +81,17 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         </div>
 
         {/* Right */}
-        <div className="navbar-end flex-1 min-w-0 justify-end gap-2">
-          {children} {/* <- render any children passed, e.g., ThemeToggle */}
-          {/* ThemeToggle as fallback if nothing is passed */}
-          {!children && <ThemeToggle />}
-
-          {/* Auth Section */}
+        <div className="navbar-end flex-1 justify-end gap-2">
+          {children || <ThemeToggle />}
           {isAuthenticated ? (
-            <div className="dropdown dropdown-end relative z-[9999] group">
+            <div className="dropdown dropdown-end">
               <label tabIndex={0} className="flex items-center cursor-pointer">
                 <div
                   className="btn btn-outline capitalize flex items-center gap-2"
-                  style={{ borderColor: theme.primary, color: theme["base-content"] }}
+                  style={{ borderColor: theme.primary }}
                 >
                   Hey {username}
-                  <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
+                  <ChevronDown className="h-4 w-4" />
                 </div>
               </label>
               <ul
@@ -109,10 +101,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
               >
                 {(role === "Chairman" || role === "Secretary General") ? (
                   <li>
-                    <Link
-                      to="/Admindashboard/AllMeetings"
-                      className="font-bold flex items-center gap-2"
-                    >
+                    <Link to="/Admindashboard/AllMeetings" className="font-bold flex items-center gap-2">
                       <UserCheck className="h-5 w-5" /> Admin Dashboard
                     </Link>
                   </li>
@@ -144,27 +133,36 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
       {/* Mobile Bottom Navbar */}
       <div
-        className="fixed bottom-0 left-0 w-full flex justify-around py-1 items-center lg:hidden shadow-inner"
-        style={{ backgroundColor: theme["base-100"] + "e6", borderColor: theme["base-200"] }}
+        className="fixed bottom-0 left-0 w-full flex justify-around items-center lg:hidden border-t shadow-inner z-50"
+        style={{
+          backgroundColor: theme["base-100"],
+          borderColor: theme["base-200"],
+          color: theme["base-content"],
+        }}
       >
         {menuItems.map((item) => (
           <Link
             key={item.name}
             to={item.path}
-            className={`flex flex-col items-center text-xs min-w-0 ${isActive(item.path)}`}
+            className={`flex flex-col items-center text-xs py-2 flex-1 transition-colors duration-150 ${
+              isActive(item.path) ? "font-bold" : ""
+            } hover:bg-[${theme["base-200"]}] active:bg-[${theme["base-300"]}]`}
           >
             {item.icon}
             <span className="text-[10px] truncate">{item.name}</span>
           </Link>
         ))}
 
-        {/* Theme Toggle */}
-        <ThemeToggle />
+        {/* Theme Toggle (only once here on mobile) */}
+        <div className="flex flex-col items-center text-xs py-2 flex-1">
+          <ThemeToggle />
+          <span className="text-[10px] truncate">Theme</span>
+        </div>
 
-        {/* Auth / Me Dropdown */}
+        {/* Auth Section */}
         {isAuthenticated ? (
-          <div className="dropdown dropdown-top dropdown-end relative z-[9999]">
-            <button tabIndex={0} className="flex flex-col items-center text-xs min-w-0">
+          <div className="dropdown dropdown-top dropdown-end">
+            <button tabIndex={0} className="flex flex-col items-center text-xs py-2 flex-1">
               <User className="w-5 h-5" />
               <span className="text-[10px] truncate">Me</span>
             </button>
@@ -196,8 +194,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         ) : (
           <Link
             to="/login"
-            className={`flex flex-col items-center text-xs min-w-0 ${isActive("/login")}`}
-            style={{ color: theme["base-content"] }}
+            className="flex flex-col items-center text-xs py-2 flex-1"
           >
             <LogIn className="w-5 h-5" />
             <span className="text-[10px] truncate">Login</span>
