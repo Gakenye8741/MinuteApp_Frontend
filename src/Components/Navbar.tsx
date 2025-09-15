@@ -1,8 +1,6 @@
 import {
   Home,
   FileQuestionMark,
-  Users,
-  Phone,
   LogIn,
   Sun,
   Moon,
