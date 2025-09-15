@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
 import { Navbar } from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import PuffLoader from "react-spinners/PuffLoader";
-import { Calendar, FileText, UserCheck, Book, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, FileText, UserCheck, Book } from "lucide-react";
 
 // API hooks
 import { useGetAllMeetingsQuery } from "../Features/Apis/meetingApis";
@@ -17,10 +17,9 @@ const MeetingDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [expandedTopics, setExpandedTopics] = useState<number[]>([]);
-
   // Fetch meeting
-  const { data: meetings, isLoading: meetingLoading, isError: meetingError } = useGetAllMeetingsQuery({});
+  const { data: meetings, isLoading: meetingLoading, isError: meetingError } =
+    useGetAllMeetingsQuery({});
   const meeting = meetings?.find((m: any) => m.id === Number(id));
 
   // Fetch attendees, topics, signatures
@@ -38,103 +37,107 @@ const MeetingDetailsPage: React.FC = () => {
 
   if (meetingError || !meeting) {
     return (
-      <div className="flex justify-center items-center h-screen text-center" style={{ color: theme.error }}>
+      <div
+        className="flex justify-center items-center h-screen text-center"
+        style={{ color: theme.error }}
+      >
         <p>Meeting not found or an error occurred.</p>
       </div>
     );
   }
 
-  const toggleTopic = (topicId: number) => {
-    setExpandedTopics(prev => prev.includes(topicId) ? prev.filter(id => id !== topicId) : [...prev, topicId]);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch(status) {
-      case "Present": return "green";
-      case "Late": return "orange";
-      case "Absent": return "red";
-      default: return theme["base-content"];
-    }
-  };
-
   return (
     <>
       <Navbar />
-      <div className="min-h-screen pt-[5rem] lg:pt-[6rem] pb-[4.5rem] lg:pb-0 px-4 sm:px-6 lg:px-20" style={{ backgroundColor: theme["base-100"], color: theme["base-content"] }}>
-
+      <div
+        className="min-h-screen pt-[5rem] lg:pt-[6rem] pb-[4.5rem] lg:pb-0 px-4 sm:px-6 lg:px-20"
+        style={{ backgroundColor: theme["base-100"], color: theme["base-content"] }}
+      >
         {/* Meeting Header */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+          <h1
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 flex items-center gap-2"
+            style={{ color: theme.primary }}
+          >
             <FileText className="w-6 h-6" /> {meeting.title}
           </h1>
           <p className="flex items-center gap-2 mb-2">
             <Calendar className="w-5 h-5" /> {new Date(meeting.date).toLocaleString()}
           </p>
-          {meeting.description && <p className="text-base-content/80">{meeting.description}</p>}
+          {meeting.description && (
+            <p style={{ color: theme["base-content"] + "CC" }}>{meeting.description}</p>
+          )}
         </div>
 
         {/* Attendees */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
             <UserCheck className="w-5 h-5" /> Attendees
           </h2>
           {attendees && attendees.length > 0 ? (
-            <ul className="list-disc pl-5 space-y-1">
+            <ul className="list-disc pl-5 space-y-1" style={{ color: theme["base-content"] }}>
               {attendees.map((a: any) => (
-                <li key={a.id} style={{ color: getStatusColor(a.status) }}>
+                <li key={a.id}>
                   {a.name} - {a.email} ({a.status})
                 </li>
               ))}
             </ul>
-          ) : <p>No attendees found.</p>}
+          ) : (
+            <p style={{ color: theme["base-content"] + "80" }}>No attendees found.</p>
+          )}
         </section>
 
         {/* Topics */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
             <Book className="w-5 h-5" /> Topics
           </h2>
           {topics && topics.length > 0 ? (
-            <div className="space-y-3">
+            <ul className="list-decimal pl-5 space-y-1" style={{ color: theme["base-content"] }}>
               {topics.map((t: any) => (
-                <div key={t.id} className="border rounded p-3" style={{ borderColor: theme["base-300"] }}>
-                  <div className="flex justify-between items-center cursor-pointer" onClick={() => toggleTopic(t.id)}>
-                    <span className="font-semibold" style={{ color: theme.primary }}>{t.subject}</span>
-                    {expandedTopics.includes(t.id) ? <ChevronUp /> : <ChevronDown />}
-                  </div>
-                  {expandedTopics.includes(t.id) && (
-                    <div className="mt-2 space-y-1" style={{ color: theme["base-content"] }}>
-                      <p><strong>Notes:</strong> {t.notes}</p>
-                      <p><strong>Decisions:</strong> {t.decisions}</p>
-                      <p><strong>Actions:</strong> {t.actions}</p>
-                    </div>
+                <li key={t.id}>
+                  <p className="font-semibold">{t.subject}</p>
+                  <p style={{ color: theme["base-content"] + "AA" }}>{t.notes}</p>
+                  {t.decisions && (
+                    <p style={{ color: theme["base-content"] + "AA" }}><strong>Decision:</strong> {t.decisions}</p>
                   )}
-                </div>
+                  {t.actions && (
+                    <p style={{ color: theme["base-content"] + "AA" }}><strong>Action:</strong> {t.actions}</p>
+                  )}
+                </li>
               ))}
-            </div>
-          ) : <p>No topics found.</p>}
+            </ul>
+          ) : (
+            <p style={{ color: theme["base-content"] + "80" }}>No topics found.</p>
+          )}
         </section>
 
         {/* Signatures */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
             <FileText className="w-5 h-5" /> Signatures
           </h2>
           {signatures && signatures.length > 0 ? (
-            <ul className="list-disc pl-5 space-y-1">
+            <ul className="list-disc pl-5 space-y-1" style={{ color: theme["base-content"] }}>
               {signatures.map((s: any) => (
                 <li key={s.id}>
-                  Signed By: {s.signedBy} - {new Date(s.createdAt).toLocaleString()}
+                  Signed By: <span style={{ fontWeight: 600 }}>{s.user.fullName}</span> on{" "}
+                  {new Date(s.signedAt).toLocaleString()} ({s.role})
                 </li>
               ))}
             </ul>
-          ) : <p>No signatures found.</p>}
+          ) : (
+            <p style={{ color: theme["base-content"] + "80" }}>No signatures found.</p>
+          )}
         </section>
 
-        <button onClick={() => navigate(-1)} className="mt-4 btn btn-outline" style={{ borderColor: theme.primary, color: theme.primary }}>
+        <button
+          onClick={() => navigate(-1)}
+          className="mt-4 btn btn-outline"
+          style={{ borderColor: theme.primary, color: theme.primary }}
+        >
           Go Back
         </button>
-
       </div>
       <Footer />
     </>
