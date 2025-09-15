@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+#js
+main.js
+ThemeContext.js
+ThemeToggle.js
+heme.jsstore.js
