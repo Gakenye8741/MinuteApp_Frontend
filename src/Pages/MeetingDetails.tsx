@@ -4,7 +4,7 @@ import { useTheme } from "../ThemeContext";
 import { Navbar } from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import PuffLoader from "react-spinners/PuffLoader";
-import { Calendar, FileText, UserCheck, Book, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, FileText, UserCheck, Book, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
 
 // API hooks
 import { useGetAllMeetingsQuery } from "../Features/Apis/meetingApis";
@@ -47,6 +47,20 @@ const MeetingDetailsPage: React.FC = () => {
     );
   }
 
+  // Function to determine attendee status color
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "present":
+        return theme.secondary; // green
+      case "late":
+        return theme.accent; // red/orange
+      case "absent":
+        return theme["neutral"]; // gray
+      default:
+        return theme["base-content"];
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -54,6 +68,16 @@ const MeetingDetailsPage: React.FC = () => {
         className="min-h-screen pt-[5rem] lg:pt-[6rem] pb-[4.5rem] lg:pb-0 px-4 sm:px-6 lg:px-20"
         style={{ backgroundColor: theme["base-100"], color: theme["base-content"] }}
       >
+        {/* Go Back Button at Top */}
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-6 flex items-center gap-2 btn btn-outline"
+          style={{ borderColor: theme.primary, color: theme.primary }}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Go Back
+        </button>
+
         {/* Meeting Header */}
         <div className="mb-8">
           <h1
@@ -81,7 +105,7 @@ const MeetingDetailsPage: React.FC = () => {
                 <li
                   key={a.id}
                   style={{
-                    color: theme["base-content"],
+                    color: getStatusColor(a.status),
                     backgroundColor: theme["base-200"],
                     padding: "4px 8px",
                     borderRadius: "4px",
@@ -162,14 +186,6 @@ const MeetingDetailsPage: React.FC = () => {
             <p style={{ color: theme["base-content"] + "88" }}>No signatures found.</p>
           )}
         </section>
-
-        <button
-          onClick={() => navigate(-1)}
-          className="mt-4 btn btn-outline"
-          style={{ borderColor: theme.primary, color: theme.primary }}
-        >
-          Go Back
-        </button>
       </div>
       <Footer />
     </>
