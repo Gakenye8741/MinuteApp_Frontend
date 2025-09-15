@@ -79,7 +79,7 @@ export const Navbar = () => {
 
           {/* Auth Section */}
           {isAuthenticated ? (
-            <div className="dropdown dropdown-end group">
+            <div className="dropdown dropdown-end relative z-[9999] group">
               <label tabIndex={0} className="flex items-center cursor-pointer">
                 <div className="btn btn-outline btn-primary capitalize flex items-center gap-2">
                   Hey {username}
@@ -88,7 +88,7 @@ export const Navbar = () => {
               </label>
               <ul
                 tabIndex={0}
-                className="menu dropdown-content bg-base-100 shadow rounded-box w-52 mt-2 z-20"
+                className="menu dropdown-content bg-base-100 shadow rounded-box w-52 mt-2 z-[9999]"
               >
                 {role === "Chairman" || role === "Secretary General" ? (
                   <li>
@@ -122,7 +122,7 @@ export const Navbar = () => {
       </div>
 
       {/* Mobile Bottom Navbar */}
-      <div className="fixed bottom-0 left-0 w-full bg-base-100/90 backdrop-blur border-t border-base-300 shadow-inner lg:hidden z-50 overflow-hidden">
+      <div className="fixed bottom-0 left-0 w-full bg-base-100/90 backdrop-blur border-t border-base-300 shadow-inner lg:hidden z-50">
         <div className="flex justify-around py-1 items-center w-full">
           {menuItems.map((item) => (
             <Link
@@ -146,14 +146,14 @@ export const Navbar = () => {
 
           {/* Auth / Me Dropdown */}
           {isAuthenticated ? (
-            <div className="dropdown dropdown-top dropdown-end">
+            <div className="dropdown dropdown-top dropdown-end relative z-[9999]">
               <button tabIndex={0} className="flex flex-col items-center text-xs min-w-0">
                 <User className="w-5 h-5" />
                 <span className="text-[10px] truncate">Me</span>
               </button>
               <ul
                 tabIndex={0}
-                className="menu dropdown-content bg-base-100 shadow rounded-box mt-1 min-w-max p-2"
+                className="menu dropdown-content bg-base-100 shadow rounded-box mt-1 min-w-max p-2 z-[9999]"
               >
                 {role === "Chairman" || role === "Secretary General" ? (
                   <li>
