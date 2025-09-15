@@ -1,194 +1,198 @@
-import React from "react";
-import { useParams, Link } from "react-router-dom";
-import { useGetMeetingByIdQuery } from "../Features/Apis/meetingApis";
-import { useGetAllAttendeesQuery } from "../Features/Apis/AttendeesApi";
-import { useGetTopicsByMeetingIdQuery } from "../Features/Apis/Topics.Api";
-import { useGetSignaturesByMeetingIdQuery } from "../Features/Apis/SignaturesApi";
+import React, { useState, useMemo } from "react";
+import { useGetAllMeetingsQuery } from "../Features/Apis/meetingApis";
 import { Navbar } from "../Components/Navbar";
+import { useNavigate } from "react-router-dom";
 import Footer from "../Components/Footer";
 import { motion } from "framer-motion";
-import { Users, BookOpen, PenTool, ChevronLeft } from "lucide-react";
+import { Calendar, FileText, Search } from "lucide-react";
 import PuffLoader from "react-spinners/PuffLoader";
 
-const MeetingDetails: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const meetingId = id ? Number(id) : undefined;
+const MeetingList: React.FC = () => {
+  const { data: meetings, isLoading, isError } = useGetAllMeetingsQuery({});
+  const navigate = useNavigate();
 
-  const { data: meeting, isLoading: loadingMeeting } = useGetMeetingByIdQuery(id!);
-  const { data: attendees } = useGetAllAttendeesQuery(meetingId ? String(meetingId) : undefined);
-  const { data: topics } = useGetTopicsByMeetingIdQuery(id!);
-  const { data: signatures } = useGetSignaturesByMeetingIdQuery(meetingId!);
+  const [search, setSearch] = useState("");
+  const [filterDate, setFilterDate] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(6);
 
-  if (loadingMeeting)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <PuffLoader color="#2563EB" size={80} />
-      </div>
-    );
+  const filteredMeetings = useMemo(() => {
+    if (!meetings) return [];
+    return meetings.filter((meeting: any) => {
+      const matchesName = meeting.title
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      const matchesDate = filterDate
+        ? new Date(meeting.date).toISOString().slice(0, 10) === filterDate
+        : true;
+      return matchesName && matchesDate;
+    });
+  }, [meetings, search, filterDate]);
 
-  if (!meeting)
-    return <div className="text-center py-10 text-red-500">Meeting not found.</div>;
+  const totalPages = Math.ceil(filteredMeetings.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedMeetings = filteredMeetings.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
-    <div className="font-sans bg-base-100 text-secondary min-h-screen pt-[6rem] lg:pt-[6rem] pb-[4.5rem] lg:pb-0">
+    <>
       <Navbar />
-
-      <main className="px-4 sm:px-6 lg:px-20 max-w-5xl mx-auto space-y-10">
-        {/* Back Button */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-4"
-        >
-          <Link
-            to="/meetings"
-            className="inline-flex items-center gap-2 text-primary font-medium bg-base-200 hover:bg-base-300 transition-colors px-4 py-2 rounded-lg shadow-sm"
-          >
-            <ChevronLeft className="w-5 h-5" /> Back to Meetings
-          </Link>
-        </motion.div>
-
-        {/* Meeting Info */}
+      <div className="font-sans bg-base-100 dark:bg-base-200 text-base-content dark:text-base-content min-h-screen pt-[5rem] lg:pt-[6rem] pb-[4.5rem] lg:pb-0">
+        {/* Hero / Page Header */}
         <motion.section
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="bg-base-100 p-6 sm:p-8 rounded-xl shadow-md hover:shadow-lg border border-text-primary"
+          className="py-12 px-4 sm:py-16 sm:px-6 lg:px-20 text-center"
         >
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-3xl sm:text-4xl font-bold text-primary mb-3"
-          >
-            {meeting.title}
-          </motion.h1>
-          <p className="text-gray-600 mb-6 text-lg">
-            {new Date(meeting.date).toLocaleString()}
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary dark:text-primary-content mb-4">
+            Official Meetings
+          </h1>
+          <p className="text-base sm:text-lg lg:text-xl text-base-content/80 dark:text-base-content/70">
+            Browse all meetings and view detailed minutes for transparency and
+            records.
           </p>
-
-          {/* Attendees */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            className="mb-8"
-          >
-            <h2 className="text-2xl font-semibold text-primary mb-3 flex items-center gap-2">
-              <Users className="w-6 h-6 text-primary" /> Attendees
-            </h2>
-            <ul className="list-disc list-inside text-gray-700 space-y-1">
-              {attendees?.map((att: any, index: number) => (
-                <motion.li
-                  key={att.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  className={getStatusColor(att.status)}
-                >
-                  {att.name} ({att.status})
-                </motion.li>
-              ))}
-              {(!attendees || attendees.length === 0) && (
-                <p className="text-gray-500">No attendees recorded.</p>
-              )}
-            </ul>
-          </motion.div>
-
-          {/* Topics / Minutes */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="mb-8"
-          >
-            <h2 className="text-2xl font-semibold text-primary mb-3 flex items-center gap-2">
-              <BookOpen className="w-6 h-6 text-primary" /> Topics / Minutes
-            </h2>
-            <div className="space-y-4">
-              {topics?.map((topic: any, index: number) => (
-                <motion.div
-                  key={topic.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 + index * 0.15, duration: 0.5 }}
-                  className="bg-base-200 p-4 rounded-xl border border-text-primary shadow-sm hover:shadow-md"
-                >
-                  <h3 className="text-xl font-medium text-primary mb-2">
-                    {topic.subject}
-                  </h3>
-                  {topic.notes && (
-                    <p className="text-gray-600 mb-1">
-                      <strong>Notes:</strong> {topic.notes}
-                    </p>
-                  )}
-                  {topic.decisions && (
-                    <p className="text-gray-600 mb-1">
-                      <strong>Decisions:</strong> {topic.decisions}
-                    </p>
-                  )}
-                  {topic.actions && (
-                    <p className="text-gray-600">
-                      <strong>Actions:</strong> {topic.actions}
-                    </p>
-                  )}
-                </motion.div>
-              ))}
-              {(!topics || topics.length === 0) && (
-                <p className="text-gray-500">No topics/minutes available.</p>
-              )}
-            </div>
-          </motion.div>
-
-          {/* Signatures */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.6 }}
-          >
-            <h2 className="text-2xl font-semibold text-primary mb-3 flex items-center gap-2">
-              <PenTool className="w-6 h-6 text-primary" /> Signatures
-            </h2>
-            <ul className="list-disc list-inside text-gray-700 space-y-1">
-              {signatures?.map((sig: any, index: number) => (
-                <motion.li
-                  key={sig.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.8 + index * 0.1 }}
-                  className="text-gray-700"
-                >
-                  {sig.role} - Signed by {sig.signedBy} at{" "}
-                  {sig.signedAt
-                    ? new Date(sig.signedAt).toLocaleString()
-                    : "Unknown time"}
-                </motion.li>
-              ))}
-              {(!signatures || signatures.length === 0) && (
-                <p className="text-gray-500">No signatures recorded.</p>
-              )}
-            </ul>
-          </motion.div>
         </motion.section>
-      </main>
 
-      <Footer />
-    </div>
+        {/* Search & Filter Controls */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-6 lg:px-20 mb-8">
+          <div className="relative w-full sm:w-1/2 lg:w-1/3">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search by meeting name..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:outline-none bg-base-200 dark:bg-base-300 text-base-content dark:text-base-content placeholder-gray-500 dark:placeholder-gray-400"
+            />
+          </div>
+
+          <input
+            type="date"
+            value={filterDate}
+            onChange={(e) => {
+              setFilterDate(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="w-full sm:w-1/3 lg:w-1/4 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:outline-none bg-base-200 dark:bg-base-300 text-base-content dark:text-base-content placeholder-gray-500 dark:placeholder-gray-400"
+          />
+        </div>
+
+        {/* Meetings Grid */}
+        <main className="py-10 px-4 sm:py-12 sm:px-6 lg:px-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {isLoading && (
+            <div className="col-span-full flex justify-center items-center py-20">
+              <PuffLoader color="#818cf8" size={80} />
+            </div>
+          )}
+          {isError && (
+            <div className="col-span-full text-center py-10 text-error dark:text-error-content">
+              Error loading meetings.
+            </div>
+          )}
+
+          {paginatedMeetings && paginatedMeetings.length > 0 ? (
+            paginatedMeetings.map((meeting: any, index: number) => (
+              <motion.div
+                key={meeting.id}
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
+                whileHover={{ scale: 1.03 }}
+                className="bg-base-100 dark:bg-base-200 p-6 rounded-xl shadow-md hover:shadow-lg flex flex-col justify-between border border-base-content/20 dark:border-base-content/40"
+              >
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-primary dark:text-primary-content mb-2 flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-primary dark:text-primary-content" />
+                    {meeting.title}
+                  </h2>
+
+                  <p className="text-base-content/70 dark:text-base-content/60 mb-4 flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-base-content/60 dark:text-base-content/50" />
+                    {new Date(meeting.date).toLocaleString()}
+                  </p>
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate(`/meetings/${meeting.id}`)}
+                  className="mt-auto btn btn-primary px-4 py-2 text-base sm:text-lg font-semibold w-full flex items-center justify-center gap-2"
+                >
+                  <FileText className="w-5 h-5" />
+                  View Details
+                </motion.button>
+              </motion.div>
+            ))
+          ) : (
+            !isLoading && (
+              <p className="col-span-full text-center text-base-content/60 dark:text-base-content/50">
+                No meetings found.
+              </p>
+            )
+          )}
+        </main>
+
+        {/* Pagination Controls */}
+        {!isLoading && filteredMeetings.length > 0 && (
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-6 lg:px-20 pb-12">
+            <div className="flex items-center gap-2">
+              <label className="text-base-content/70 dark:text-base-content/60">
+                Show:
+              </label>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="border rounded-lg px-3 py-1 shadow-sm focus:ring-2 focus:ring-primary focus:outline-none bg-base-200 dark:bg-base-300 text-base-content dark:text-base-content"
+              >
+                <option value={3}>3</option>
+                <option value={6}>6</option>
+                <option value={9}>9</option>
+                <option value={12}>12</option>
+              </select>
+              <span className="text-base-content/70 dark:text-base-content/60">per page</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => goToPage(currentPage - 1)}
+                className="px-3 py-1 border rounded-lg shadow-sm disabled:opacity-50 hover:bg-base-200 dark:hover:bg-base-300"
+              >
+                Prev
+              </button>
+              <span className="text-base-content/70 dark:text-base-content/60">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => goToPage(currentPage + 1)}
+                className="px-3 py-1 border rounded-lg shadow-sm disabled:opacity-50 hover:bg-base-200 dark:hover:bg-base-300"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+
+        <Footer />
+      </div>
+    </>
   );
 };
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "Present":
-      return "text-green-600";
-    case "Absent":
-      return "text-red-600";
-    case "Late":
-      return "text-yellow-600";
-    default:
-      return "text-gray-600";
-  }
-};
-
-export default MeetingDetails;
+export default MeetingList;

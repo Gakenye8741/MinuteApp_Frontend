@@ -1,51 +1,34 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, useParams } from "react-router-dom";
 import { Home } from "./Pages/Home";
 import AboutPage from "./Pages/About";
 import Login from "./Pages/Login";
-import Meetings from "./Pages/Meetings"; // Meeting list page
-import MeetingDetails from "./Pages/MeetingDetails"; // Meeting details page
+import Meetings from "./Pages/Meetings";
+import MeetingDetails from "./Pages/MeetingDetails";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
 import { AdminLayout } from "./Dashboard/DashboardDesign/AdminLayout";
 import { AdminDashBoard } from "./Pages/Dashboard/AdminDashboard";
 import { ManageMeetings } from "./Dashboard/AdminDashboard/ManageMeetings";
 import ManageAttendees from "./Dashboard/AdminDashboard/ManageAttendees";
-import { useParams } from "react-router-dom";
+import ManageTopics from "./Dashboard/AdminDashboard/ManageTopics";
+import ManageSignatures from "./Dashboard/AdminDashboard/ManageSignatures";
+import ManageOfficials from "./Dashboard/AdminDashboard/ManageOfficials";
+import { ThemeProvider } from "./ThemeContext";
+import ThemeToggle from "./ThemeToggle";
 
-// Wrapper to extract meetingId from route params and pass to ManageAttendees
+// Wrapper to extract meetingId from route params
 const ManageAttendeesWrapper = () => {
   const { meetingId } = useParams<{ meetingId: string }>();
   if (!meetingId) return <div>Meeting ID is required</div>;
   return <ManageAttendees meetingId={meetingId} />;
 }
-import ManageTopics from "./Dashboard/AdminDashboard/ManageTopics";
-import ManageSignatures from "./Dashboard/AdminDashboard/ManageSignatures";
-import ManageOfficials from "./Dashboard/AdminDashboard/ManageOfficials";
-
-
-// import Error from "./Pages/Error"; // optional
 
 const App = () => {
   const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <Home />,
-    },
-    {
-      path: "/about",
-      element: <AboutPage />,
-    },
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/meetings",
-      element: <Meetings />, // List of meetings
-    },
-    {
-      path: "/meetings/:id",
-      element: <MeetingDetails />, // Details page for a single meeting
-    },
+    { path: "/", element: <Home /> },
+    { path: "/about", element: <AboutPage /> },
+    { path: "/login", element: <Login /> },
+    { path: "/meetings", element: <Meetings /> },
+    { path: "/meetings/:id", element: <MeetingDetails /> },
     {
       path: "/Admindashboard",
       element: (
@@ -53,9 +36,8 @@ const App = () => {
           <AdminLayout />
         </ProtectedRoutes>
       ),
-      // errorElement: <Error />,
       children: [
-        { index: true, element: <AdminDashBoard /> }, // default at /Admindashboard
+        { index: true, element: <AdminDashBoard /> },
         { path: "AllOfficials", element: <ManageOfficials /> },
         { path: "AllMeetings", element: <ManageMeetings /> },
         { path: "AllAttendees", element: <ManageAttendees meetingId={""} /> },
@@ -64,13 +46,18 @@ const App = () => {
         { path: "AllSignatures", element: <ManageSignatures /> },
       ]
     },
-    {
-      path: "*",
-      element: <Home />, // fallback for unknown routes
-    },
+    { path: "*", element: <Home /> },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <ThemeProvider>
+      <div className="app">
+        {/* Place toggle anywhere, for example top-right corner */}
+        <ThemeToggle />
+        <RouterProvider router={router} />
+      </div>
+    </ThemeProvider>
+  );
 };
 
 export default App;

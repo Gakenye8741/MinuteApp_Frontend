@@ -1,47 +1,57 @@
 import { NavLink } from "react-router-dom";
-import {
- 
-  LogOut,
-  Pen,
-  PenBox,
-  User2,
-  
-} from "lucide-react";
+import { LogOut, Pen, PenBox, User2 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { clearCredentials } from "../../Features/Auth/AuthSlice";
 import { FaMeetup } from "react-icons/fa";
+import { useTheme } from "../../ThemeContext";
 
 const navItems = [
-   { name: "Manage Officials", path: "AllOfficials", icon: <FaMeetup className="text-indigo-400" /> },
-  { name: "Manage Meetings", path: "AllMeetings", icon: <PenBox className="text-indigo-400" /> },
-  { name: "Manage Attendees", path: "AllAttendees", icon: <User2 className="text-indigo-400" /> },
-  { name: "Manage Topics", path: "AllTopics", icon: <User2 className="text-indigo-400" /> },
-  { name: "Manage Signatures", path: "AllSignatures", icon: <Pen className="text-indigo-400" /> },
-  { name: "Logout", path: "logout", icon: <LogOut className="text-red-500" /> },
+  { name: "Manage Officials", path: "AllOfficials", icon: <FaMeetup /> },
+  { name: "Manage Meetings", path: "AllMeetings", icon: <PenBox /> },
+  { name: "Manage Attendees", path: "AllAttendees", icon: <User2 /> },
+  { name: "Manage Topics", path: "AllTopics", icon: <User2 /> },
+  { name: "Manage Signatures", path: "AllSignatures", icon: <Pen /> },
+  { name: "Logout", path: "logout", icon: <LogOut /> },
 ];
 
 export const AdminSideNav = ({ onNavItemClick }: { onNavItemClick?: () => void }) => {
   const dispatch = useDispatch();
+  const { theme } = useTheme(); // ThemeContext
 
   const handleLogout = () => {
     dispatch(clearCredentials());
     onNavItemClick?.();
   };
 
+  // Dynamic colors for light/dark mode
+  const getActiveTabStyles = () => {
+    // Example: Assume dark mode if base-content is a light color (e.g., "#fff" or "white")
+    const isDark = theme["base-content"] === "#fff" || theme["base-content"].toLowerCase() === "white";
+    if (isDark) {
+      return { bg: theme.primary + "22", text: theme.primary }; // Slightly transparent primary for dark mode
+    } else {
+      return { bg: theme.primary, text: theme["base-100"] }; // Primary background with white text in light mode
+    }
+  };
+
+  const activeTab = getActiveTabStyles();
+
   return (
     <aside
-      className="
-        flex flex-col
-        h-full
-        w-full md:w-64 lg:w-72
-        bg-base-200 text-base-content
-        p-4 rounded-lg shadow-md border border-blue-500
-        overflow-y-auto
-        max-h-screen
-      "
+      className="flex flex-col h-full w-full md:w-64 lg:w-72 p-4 rounded-lg shadow-md overflow-y-auto max-h-screen transition-colors duration-300"
+      style={{
+        backgroundColor: theme["base-200"],
+        color: theme["base-content"],
+        borderColor: theme.primary,
+      }}
     >
       {/* Header */}
-      <h4 className="mb-6 flex items-center justify-center text-lg md:text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-yellow-500">
+      <h4
+        className="mb-6 flex items-center justify-center text-lg md:text-xl font-extrabold text-transparent bg-clip-text"
+        style={{
+          backgroundImage: "linear-gradient(to right, #4f46e5, #8b5cf6, #f59e0b)",
+        }}
+      >
         <span className="mr-2">🛠️</span>
         Admin Panel
         <span className="ml-2">👑</span>
@@ -54,7 +64,16 @@ export const AdminSideNav = ({ onNavItemClick }: { onNavItemClick?: () => void }
             <button
               key={index}
               onClick={handleLogout}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-base-300 transition w-full text-left"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg transition w-full text-left"
+              style={{
+                color: theme.error,
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = theme["base-300"])
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = theme["base-200"])
+              }
               aria-label="Logout"
             >
               {item.icon}
@@ -66,11 +85,11 @@ export const AdminSideNav = ({ onNavItemClick }: { onNavItemClick?: () => void }
               to={item.path}
               end
               onClick={onNavItemClick}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg transition hover:bg-base-300 ${
-                  isActive ? "bg-base-300 font-semibold text-primary" : ""
-                }`
-              }
+              style={({ isActive }) => ({
+                backgroundColor: isActive ? activeTab.bg : "transparent",
+                color: isActive ? activeTab.text : theme["base-content"],
+              })}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:bg-[rgba(255,255,255,0.05)]"
               aria-label={`Go to ${item.name}`}
             >
               {item.icon}

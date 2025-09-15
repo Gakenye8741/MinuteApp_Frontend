@@ -1,3 +1,4 @@
+import React, { ReactNode } from "react";
 import {
   Home,
   FileQuestionMark,
@@ -10,14 +11,19 @@ import {
   LogOut,
   BookAIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import type { RootState } from "../App/store";
+import { useTheme } from "../ThemeContext";
 import { clearCredentials } from "../Features/Auth/AuthSlice";
+import type { RootState } from "../App/store";
+import ThemeToggle from "../ThemeToggle";
 
-export const Navbar = () => {
-  const [theme, setTheme] = useState<"garden" | "dark">("garden");
+interface NavbarProps {
+  children?: ReactNode; // <- add children support
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ children }) => {
+  const { theme, toggleTheme, isDark } = useTheme(); // Global theme
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -32,38 +38,45 @@ export const Navbar = () => {
   ];
 
   const isActive = (path: string) =>
-    location.pathname === path ? "text-primary font-bold" : "text-gray-500";
+    location.pathname === path
+      ? `font-bold ${theme.primary}`
+      : theme["base-content"];
 
   const handleLogout = () => {
     dispatch(clearCredentials());
   };
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "garden" ? "dark" : "garden"));
-  };
-
   return (
     <>
       {/* Desktop Navbar */}
-      <div className="navbar fixed top-0 left-0 right-0 z-50 bg-base-100/90 backdrop-blur text-base-content shadow-sm border-b border-base-300 flex flex-wrap hidden lg:flex">
+      <div
+        className="navbar fixed top-0 left-0 right-0 z-50 flex flex-wrap hidden lg:flex shadow-sm border-b"
+        style={{
+          backgroundColor: theme["base-100"] + "e6", // slightly transparent
+          color: theme["base-content"],
+          borderColor: theme["base-200"],
+        }}
+      >
+        {/* Left */}
         <div className="navbar-start flex-1 min-w-0">
           <Link
             to="/"
             className="btn btn-ghost text-xl font-bold leading-tight text-left whitespace-normal"
+            style={{ color: theme.primary }}
           >
             Computing And Innovation <br /> Society of Laikipia University
           </Link>
         </div>
 
+        {/* Center */}
         <div className="navbar-center flex-1 min-w-0">
           <ul className="menu menu-horizontal px-1 flex-1 flex-wrap">
             {menuItems.map((item) => (
               <li key={item.name}>
-                <Link to={item.path} className={isActive(item.path)}>
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-1 ${isActive(item.path)}`}
+                >
                   {item.icon} {item.name}
                 </Link>
               </li>
@@ -71,26 +84,30 @@ export const Navbar = () => {
           </ul>
         </div>
 
-        <div className="navbar-end gap-2 flex-1 min-w-0 justify-end">
-          {/* Theme Toggle */}
-          <button className="btn btn-ghost btn-circle" onClick={toggleTheme}>
-            {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-          </button>
+        {/* Right */}
+        <div className="navbar-end flex-1 min-w-0 justify-end gap-2">
+          {children} {/* <- render any children passed, e.g., ThemeToggle */}
+          {/* ThemeToggle as fallback if nothing is passed */}
+          {!children && <ThemeToggle />}
 
           {/* Auth Section */}
           {isAuthenticated ? (
             <div className="dropdown dropdown-end relative z-[9999] group">
               <label tabIndex={0} className="flex items-center cursor-pointer">
-                <div className="btn btn-outline btn-primary capitalize flex items-center gap-2">
+                <div
+                  className="btn btn-outline capitalize flex items-center gap-2"
+                  style={{ borderColor: theme.primary, color: theme["base-content"] }}
+                >
                   Hey {username}
                   <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
                 </div>
               </label>
               <ul
                 tabIndex={0}
-                className="menu dropdown-content bg-base-100 shadow rounded-box w-52 mt-2 z-[9999]"
+                className="menu dropdown-content shadow rounded-box w-52 mt-2"
+                style={{ backgroundColor: theme["base-100"], color: theme["base-content"] }}
               >
-                {role === "Chairman" || role === "Secretary General" ? (
+                {(role === "Chairman" || role === "Secretary General") ? (
                   <li>
                     <Link
                       to="/Admindashboard/AllMeetings"
@@ -107,70 +124,8 @@ export const Navbar = () => {
                   </li>
                 )}
                 <li>
-                  <button onClick={handleLogout} className="flex items-center gap-2">
-                    <LogOut className="h-5 w-5" /> Logout
-                  </button>
-                </li>
-              </ul>
-            </div>
-          ) : (
-            <Link to="/login" className={`btn btn-primary ${isActive("/login")}`}>
-              <LogIn className="inline mr-2 h-4 w-4" /> Login
-            </Link>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile Bottom Navbar */}
-      <div className="fixed bottom-0 left-0 w-full bg-base-100/90 backdrop-blur border-t border-base-300 shadow-inner lg:hidden z-50">
-        <div className="flex justify-around py-1 items-center w-full">
-          {menuItems.map((item) => (
-            <Link
-              key={item.name}
-              to={item.path}
-              className={`flex flex-col items-center text-xs min-w-0 ${isActive(item.path)}`}
-            >
-              {item.icon}
-              <span className="text-[10px] truncate">{item.name}</span>
-            </Link>
-          ))}
-
-          {/* Theme Toggle */}
-          <button
-            className="flex flex-col items-center text-xs min-w-0"
-            onClick={toggleTheme}
-          >
-            {theme === "dark" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-            <span className="text-[10px] truncate">Theme</span>
-          </button>
-
-          {/* Auth / Me Dropdown */}
-          {isAuthenticated ? (
-            <div className="dropdown dropdown-top dropdown-end relative z-[9999]">
-              <button tabIndex={0} className="flex flex-col items-center text-xs min-w-0">
-                <User className="w-5 h-5" />
-                <span className="text-[10px] truncate">Me</span>
-              </button>
-              <ul
-                tabIndex={0}
-                className="menu dropdown-content bg-base-100 shadow rounded-box mt-1 min-w-max p-2 z-[9999]"
-              >
-                {role === "Chairman" || role === "Secretary General" ? (
-                  <li>
-                    <Link to="/Admindashboard/AllMeetings" className="flex items-center gap-2">
-                      <UserCheck className="w-4 h-4" /> Admin Dashboard
-                    </Link>
-                  </li>
-                ) : (
-                  <li>
-                    <Link to="/dashboard" className="flex items-center gap-2">
-                      <User className="w-4 h-4" /> User Dashboard
-                    </Link>
-                  </li>
-                )}
-                <li>
                   <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left">
-                    <LogOut className="w-4 h-4" /> Logout
+                    <LogOut className="h-5 w-5" /> Logout
                   </button>
                 </li>
               </ul>
@@ -178,13 +133,76 @@ export const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className={`flex flex-col items-center text-xs min-w-0 ${isActive("/login")}`}
+              className="btn btn-primary"
+              style={{ backgroundColor: theme.primary, color: theme["base-100"] }}
             >
-              <LogIn className="w-5 h-5" />
-              <span className="text-[10px] truncate">Login</span>
+              <LogIn className="inline mr-2 h-4 w-4" /> Login
             </Link>
           )}
         </div>
+      </div>
+
+      {/* Mobile Bottom Navbar */}
+      <div
+        className="fixed bottom-0 left-0 w-full flex justify-around py-1 items-center lg:hidden shadow-inner"
+        style={{ backgroundColor: theme["base-100"] + "e6", borderColor: theme["base-200"] }}
+      >
+        {menuItems.map((item) => (
+          <Link
+            key={item.name}
+            to={item.path}
+            className={`flex flex-col items-center text-xs min-w-0 ${isActive(item.path)}`}
+          >
+            {item.icon}
+            <span className="text-[10px] truncate">{item.name}</span>
+          </Link>
+        ))}
+
+        {/* Theme Toggle */}
+        <ThemeToggle />
+
+        {/* Auth / Me Dropdown */}
+        {isAuthenticated ? (
+          <div className="dropdown dropdown-top dropdown-end relative z-[9999]">
+            <button tabIndex={0} className="flex flex-col items-center text-xs min-w-0">
+              <User className="w-5 h-5" />
+              <span className="text-[10px] truncate">Me</span>
+            </button>
+            <ul
+              tabIndex={0}
+              className="menu dropdown-content shadow rounded-box mt-1 min-w-max p-2"
+              style={{ backgroundColor: theme["base-100"], color: theme["base-content"] }}
+            >
+              {(role === "Chairman" || role === "Secretary General") ? (
+                <li>
+                  <Link to="/Admindashboard/AllMeetings" className="flex items-center gap-2">
+                    <UserCheck className="w-4 h-4" /> Admin Dashboard
+                  </Link>
+                </li>
+              ) : (
+                <li>
+                  <Link to="/dashboard" className="flex items-center gap-2">
+                    <User className="w-4 h-4" /> User Dashboard
+                  </Link>
+                </li>
+              )}
+              <li>
+                <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left">
+                  <LogOut className="w-4 h-4" /> Logout
+                </button>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <Link
+            to="/login"
+            className={`flex flex-col items-center text-xs min-w-0 ${isActive("/login")}`}
+            style={{ color: theme["base-content"] }}
+          >
+            <LogIn className="w-5 h-5" />
+            <span className="text-[10px] truncate">Login</span>
+          </Link>
+        )}
       </div>
     </>
   );
