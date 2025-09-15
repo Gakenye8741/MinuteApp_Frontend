@@ -16,7 +16,7 @@ const MeetingDetailsPage: React.FC = () => {
   const { theme } = useTheme();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [openTopicId, setOpenTopicId] = useState<number | null>(null);
+  const [openTopics, setOpenTopics] = useState<Set<number>>(new Set()); // Store multiple open topics
 
   // Fetch meeting
   const { data: meetings, isLoading: meetingLoading, isError: meetingError } =
@@ -59,6 +59,14 @@ const MeetingDetailsPage: React.FC = () => {
       default:
         return theme["base-content"];
     }
+  };
+
+  // Toggle topic open/close
+  const toggleTopic = (id: number) => {
+    const newSet = new Set(openTopics);
+    if (newSet.has(id)) newSet.delete(id);
+    else newSet.add(id);
+    setOpenTopics(newSet);
   };
 
   return (
@@ -120,7 +128,7 @@ const MeetingDetailsPage: React.FC = () => {
           )}
         </section>
 
-        {/* Topics as collapsible dropdown */}
+        {/* Topics as collapsible dropdown (multiple open) */}
         <section className="mb-6">
           <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
             <Book className="w-5 h-5" /> Topics
@@ -128,7 +136,7 @@ const MeetingDetailsPage: React.FC = () => {
           {topics && topics.length > 0 ? (
             <div className="space-y-2">
               {topics.map((t: any) => {
-                const isOpen = openTopicId === t.id;
+                const isOpen = openTopics.has(t.id);
                 return (
                   <div
                     key={t.id}
@@ -139,9 +147,7 @@ const MeetingDetailsPage: React.FC = () => {
                     }}
                   >
                     <button
-                      onClick={() =>
-                        setOpenTopicId(isOpen ? null : t.id)
-                      }
+                      onClick={() => toggleTopic(t.id)}
                       className="w-full px-4 py-2 flex justify-between items-center font-semibold"
                       style={{ color: theme["base-content"] }}
                     >
