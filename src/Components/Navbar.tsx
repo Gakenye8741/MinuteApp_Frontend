@@ -3,11 +3,10 @@ import {
   Home,
   FileQuestionMark,
   LogIn,
-  User,
   UserCheck,
+  User,
   LogOut,
   Book,
-  ChevronDown,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -39,17 +38,6 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
   const handleLogout = () => dispatch(clearCredentials());
 
-  // Helper for dynamic tab styles
-  const getTabClasses = (active: boolean) => {
-    if (active) {
-      return "rounded-lg bg-black text-white";
-    } else {
-      return isDark
-        ? "bg-white text-black hover:bg-gray-300 active:bg-gray-400"
-        : "bg-black text-white hover:bg-gray-800 active:bg-gray-900";
-    }
-  };
-
   return (
     <>
       {/* Desktop Navbar */}
@@ -61,6 +49,7 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           borderColor: theme["base-200"],
         }}
       >
+        {/* Left */}
         <div className="navbar-start flex-1 min-w-0">
           <Link
             to="/"
@@ -71,26 +60,31 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           </Link>
         </div>
 
+        {/* Center */}
         <div className="navbar-center flex-1 min-w-0">
           <ul className="menu menu-horizontal px-1 flex-1 flex-wrap">
-            {menuItems.map((item) => {
-              const active = location.pathname === item.path;
-              return (
-                <li key={item.name}>
-                  <Link
-                    to={item.path}
-                    className={`flex items-center gap-1 font-semibold ${
-                      active ? `text-[${theme.primary}]` : `text-[${theme["base-content"]}]`
-                    }`}
-                  >
-                    {item.icon} {item.name}
-                  </Link>
-                </li>
-              );
-            })}
+            {menuItems.map((item) => (
+              <li key={item.name}>
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-1 ${
+                    location.pathname === item.path ? "font-bold" : ""
+                  }`}
+                  style={{
+                    color:
+                      location.pathname === item.path
+                        ? theme.primary
+                        : theme["base-content"],
+                  }}
+                >
+                  {item.icon} {item.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
+        {/* Right */}
         <div className="navbar-end flex-1 min-w-0 justify-end gap-2">
           {children || <ThemeToggle />}
 
@@ -99,10 +93,12 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
               <label tabIndex={0} className="flex items-center cursor-pointer">
                 <div
                   className="btn btn-outline capitalize flex items-center gap-2"
-                  style={{ borderColor: theme.primary, color: theme["base-content"] }}
+                  style={{
+                    borderColor: theme.primary,
+                    color: theme["base-content"],
+                  }}
                 >
                   Hey {username}
-                  <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
                 </div>
               </label>
               <ul
@@ -114,14 +110,14 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
                   <li>
                     <Link
                       to="/Admindashboard/AllMeetings"
-                      className="font-bold flex items-center gap-2"
+                      className="flex items-center gap-2 font-bold"
                     >
                       <UserCheck className="h-5 w-5" /> Admin Dashboard
                     </Link>
                   </li>
                 ) : (
                   <li>
-                    <Link to="/dashboard" className="font-bold flex items-center gap-2">
+                    <Link to="/dashboard" className="flex items-center gap-2 font-bold">
                       <User className="h-5 w-5" /> User Dashboard
                     </Link>
                   </li>
@@ -150,8 +146,11 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
       {/* Mobile Bottom Navbar */}
       <div
-        className="fixed bottom-0 left-0 w-full flex justify-around py-2 items-center lg:hidden shadow-inner z-50 border-t"
-        style={{ backgroundColor: theme["base-100"], borderColor: theme["base-200"] }}
+        className="fixed bottom-0 left-0 w-full flex justify-around py-2 items-center lg:hidden shadow-inner z-50 border-t rounded-t-xl"
+        style={{
+          backgroundColor: isDark ? "#1f1f1f" : "#f3f4f6",
+          borderColor: isDark ? "#333" : "#d1d5db",
+        }}
       >
         {menuItems.map((item) => {
           const active = location.pathname === item.path;
@@ -159,16 +158,24 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
             <Link
               key={item.name}
               to={item.path}
-              className={`flex flex-col items-center text-xs min-w-0 p-2 transition ${getTabClasses(active)}`}
+              className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition
+                ${active
+                  ? isDark
+                    ? "bg-white text-black"
+                    : "bg-black text-white"
+                  : ""
+                }
+                hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]
+              `}
             >
-              {React.cloneElement(item.icon, { className: `w-5 h-5 ${active ? "text-white" : isDark ? "text-black" : "text-white"}` })}
+              {item.icon}
               <span className="text-[10px] truncate">{item.name}</span>
             </Link>
           );
         })}
 
-        {/* Single Theme Toggle */}
-        <div className={`p-2 rounded-lg transition ${isDark ? "hover:bg-gray-300 active:bg-gray-400" : "hover:bg-gray-200 active:bg-gray-300"}`}>
+        {/* Theme Toggle */}
+        <div className="p-2 rounded-lg hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]">
           <ThemeToggle />
         </div>
 
@@ -177,9 +184,11 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           <div className="dropdown dropdown-top dropdown-end relative z-[9999]">
             <button
               tabIndex={0}
-              className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition ${getTabClasses(location.pathname.includes("dashboard") || location.pathname.includes("Admindashboard"))}`}
+              className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg
+                hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]
+              `}
             >
-              <User className={`w-5 h-5 ${isDark ? "text-black" : "text-white"}`} />
+              <User className="w-5 h-5" />
               <span className="text-[10px] truncate">Me</span>
             </button>
             <ul
@@ -210,9 +219,11 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         ) : (
           <Link
             to="/login"
-            className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition ${getTabClasses(location.pathname === "/login")}`}
+            className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg
+              hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]
+            `}
           >
-            <LogIn className={`w-5 h-5 ${isDark ? "text-black" : "text-white"}`} />
+            <LogIn className="w-5 h-5" />
             <span className="text-[10px] truncate">Login</span>
           </Link>
         )}
