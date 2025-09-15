@@ -3,11 +3,13 @@ import {
   Home,
   FileQuestionMark,
   LogIn,
+  Sun,
+  Moon,
   ChevronDown,
   UserCheck,
   User,
   LogOut,
-  BookAIcon,
+  Book,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -31,29 +33,27 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
   const menuItems = [
     { name: "Home", path: "/", icon: <Home className="w-5 h-5" /> },
-    { name: "About", path: "/About", icon: <FileQuestionMark className="w-5 h-5" /> },
-    { name: "Meetings", path: "/Meetings", icon: <BookAIcon className="w-5 h-5" /> },
+    { name: "About", path: "/about", icon: <FileQuestionMark className="w-5 h-5" /> },
+    { name: "Meetings", path: "/meetings", icon: <Book className="w-5 h-5" /> },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) =>
+    location.pathname === path ? `font-bold text-[${theme.primary}]` : `text-[${theme["base-content"]}]`;
 
-  const handleLogout = () => {
-    dispatch(clearCredentials());
-  };
+  const handleLogout = () => dispatch(clearCredentials());
 
   return (
     <>
-      {/* Desktop Navbar (hidden on small screens) */}
+      {/* Desktop Navbar */}
       <div
         className="navbar fixed top-0 left-0 right-0 z-50 hidden lg:flex shadow-sm border-b"
         style={{
-          backgroundColor: theme["base-100"],
+          backgroundColor: theme["base-100"] + "e6",
           color: theme["base-content"],
           borderColor: theme["base-200"],
         }}
       >
-        {/* Left */}
-        <div className="navbar-start flex-1">
+        <div className="navbar-start flex-1 min-w-0">
           <Link
             to="/"
             className="btn btn-ghost text-xl font-bold leading-tight text-left whitespace-normal"
@@ -63,19 +63,11 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           </Link>
         </div>
 
-        {/* Center */}
-        <div className="navbar-center flex-1">
-          <ul className="menu menu-horizontal px-1">
+        <div className="navbar-center flex-1 min-w-0">
+          <ul className="menu menu-horizontal px-1 flex-1 flex-wrap">
             {menuItems.map((item) => (
               <li key={item.name}>
-                <Link
-                  to={item.path}
-                  className="flex items-center gap-1"
-                  style={{
-                    fontWeight: isActive(item.path) ? "bold" : "normal",
-                    color: theme["base-content"],
-                  }}
-                >
+                <Link to={item.path} className={`flex items-center gap-1 ${isActive(item.path)}`}>
                   {item.icon} {item.name}
                 </Link>
               </li>
@@ -83,18 +75,18 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
           </ul>
         </div>
 
-        {/* Right */}
-        <div className="navbar-end flex-1 justify-end gap-2">
+        <div className="navbar-end flex-1 min-w-0 justify-end gap-2">
           {children || <ThemeToggle />}
+
           {isAuthenticated ? (
-            <div className="dropdown dropdown-end">
+            <div className="dropdown dropdown-end relative z-[9999] group">
               <label tabIndex={0} className="flex items-center cursor-pointer">
                 <div
                   className="btn btn-outline capitalize flex items-center gap-2"
-                  style={{ borderColor: theme.primary }}
+                  style={{ borderColor: theme.primary, color: theme["base-content"] }}
                 >
                   Hey {username}
-                  <ChevronDown className="h-4 w-4" />
+                  <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
                 </div>
               </label>
               <ul
@@ -104,7 +96,10 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
               >
                 {(role === "Chairman" || role === "Secretary General") ? (
                   <li>
-                    <Link to="/Admindashboard/AllMeetings" className="font-bold flex items-center gap-2">
+                    <Link
+                      to="/Admindashboard/AllMeetings"
+                      className="font-bold flex items-center gap-2"
+                    >
                       <UserCheck className="h-5 w-5" /> Admin Dashboard
                     </Link>
                   </li>
@@ -116,7 +111,10 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
                   </li>
                 )}
                 <li>
-                  <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 w-full text-left"
+                  >
                     <LogOut className="h-5 w-5" /> Logout
                   </button>
                 </li>
@@ -136,47 +134,33 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
       {/* Mobile Bottom Navbar */}
       <div
-        className="fixed bottom-0 left-0 w-full flex justify-around items-center lg:hidden border-t shadow-inner z-50"
-        style={{
-          backgroundColor: theme["base-100"],
-          borderColor: theme["base-200"],
-          color: theme["base-content"],
-        }}
+        className="fixed bottom-0 left-0 w-full flex justify-around py-2 items-center lg:hidden shadow-inner z-50 border-t"
+        style={{ backgroundColor: theme["base-100"], borderColor: theme["base-200"] }}
       >
         {menuItems.map((item) => (
           <Link
             key={item.name}
             to={item.path}
-            className="flex flex-col items-center text-xs py-2 flex-1 rounded-md transition-colors duration-150"
-            style={{
-              backgroundColor: isActive(item.path) ? theme.primary : "transparent",
-              color: isActive(item.path) ? theme["base-100"] : theme["base-content"],
-            }}
+            className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition 
+              ${isActive(item.path)} 
+              hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]`}
           >
             {item.icon}
             <span className="text-[10px] truncate">{item.name}</span>
           </Link>
         ))}
 
-        {/* Theme Toggle */}
-        <div
-          className="flex flex-col items-center text-xs py-2 flex-1 rounded-md transition-colors duration-150"
-          style={{
-            backgroundColor: "transparent",
-            color: theme["base-content"],
-          }}
-        >
+        {/* Single Theme Toggle */}
+        <div className="p-2 rounded-lg hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]">
           <ThemeToggle />
-          <span className="text-[10px] truncate">Theme</span>
         </div>
 
-        {/* Auth Section */}
+        {/* Auth / Me Dropdown */}
         {isAuthenticated ? (
-          <div className="dropdown dropdown-top dropdown-end flex-1">
+          <div className="dropdown dropdown-top dropdown-end relative z-[9999]">
             <button
               tabIndex={0}
-              className="flex flex-col items-center text-xs py-2 w-full rounded-md"
-              style={{ color: theme["base-content"] }}
+              className="flex flex-col items-center text-xs min-w-0 p-2 rounded-lg hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]"
             >
               <User className="w-5 h-5" />
               <span className="text-[10px] truncate">Me</span>
@@ -209,7 +193,9 @@ export const Navbar: React.FC<NavbarProps> = ({ children }) => {
         ) : (
           <Link
             to="/login"
-            className="flex flex-col items-center text-xs py-2 flex-1 rounded-md"
+            className={`flex flex-col items-center text-xs min-w-0 p-2 rounded-lg transition
+              ${isActive("/login")}
+              hover:bg-[rgba(0,0,0,0.05)] active:bg-[rgba(0,0,0,0.1)]`}
             style={{ color: theme["base-content"] }}
           >
             <LogIn className="w-5 h-5" />
