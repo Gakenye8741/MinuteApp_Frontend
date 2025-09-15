@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 export const Home = () => {
   return (
     <>
-      {/* <Navbar /> */}
+      <Navbar />
       <div className="pt-[0rem] lg:pt-[0rem] pb-[0rem] lg:pb-0">
         
         {/* Hero Section with animation */}
