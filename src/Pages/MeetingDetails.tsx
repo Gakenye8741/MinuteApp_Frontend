@@ -29,7 +29,7 @@ const MeetingDetailsPage: React.FC = () => {
 
   if (meetingLoading || attendeesLoading || topicsLoading || signaturesLoading) {
     return (
-      <div className="flex justify-center items-center h-screen" style={{ backgroundColor: theme["base-100"] }}>
+      <div className="flex justify-center items-center h-screen">
         <PuffLoader color={theme.primary} size={80} />
       </div>
     );
@@ -38,13 +38,15 @@ const MeetingDetailsPage: React.FC = () => {
   if (meetingError || !meeting) {
     return (
       <div
-        className="flex justify-center items-center h-screen text-center px-4"
-        style={{ color: theme.error, backgroundColor: theme["base-100"] }}
+        className="flex justify-center items-center h-screen text-center"
+        style={{ color: theme.error }}
       >
         <p>Meeting not found or an error occurred.</p>
       </div>
     );
   }
+
+  const topicList = topics || []; // use the array returned from API
 
   return (
     <>
@@ -61,17 +63,17 @@ const MeetingDetailsPage: React.FC = () => {
           >
             <FileText className="w-6 h-6" /> {meeting.title}
           </h1>
-          <p className="flex items-center gap-2 mb-2" style={{ color: theme["base-content"] + "CC" }}>
+          <p className="flex items-center gap-2 mb-2">
             <Calendar className="w-5 h-5" /> {new Date(meeting.date).toLocaleString()}
           </p>
           {meeting.description && (
-            <p style={{ color: theme["base-content"] + "B3" }}>{meeting.description}</p>
+            <p style={{ color: theme["base-content"] + "CC" }}>{meeting.description}</p>
           )}
         </div>
 
         {/* Attendees */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
             <UserCheck className="w-5 h-5" /> Attendees
           </h2>
           {attendees && attendees.length > 0 ? (
@@ -89,14 +91,17 @@ const MeetingDetailsPage: React.FC = () => {
 
         {/* Topics */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
             <Book className="w-5 h-5" /> Topics
           </h2>
-          {topics && topics.length > 0 ? (
-            <ul className="list-decimal pl-5 space-y-1" style={{ color: theme["base-content"] }}>
-              {topics.map((t: any) => (
-                <li key={t.id}>
-                  {t.title || t.topic || t.name || "No Title"}
+          {topicList.length > 0 ? (
+            <ul className="list-decimal pl-5 space-y-3">
+              {topicList.map((t: any) => (
+                <li key={t.id} style={{ color: theme["base-content"] }}>
+                  <p className="font-semibold">{t.subject}</p>
+                  {t.notes && <p style={{ color: theme["base-content"] + "AA" }}>{t.notes}</p>}
+                  {t.decisions && <p style={{ color: theme["base-content"] + "AA" }}><strong>Decision:</strong> {t.decisions}</p>}
+                  {t.actions && <p style={{ color: theme["base-content"] + "AA" }}><strong>Action:</strong> {t.actions}</p>}
                 </li>
               ))}
             </ul>
@@ -107,7 +112,7 @@ const MeetingDetailsPage: React.FC = () => {
 
         {/* Signatures */}
         <section className="mb-6">
-          <h2 className="text-xl font-bold mb-2 flex items-center gap-2" style={{ color: theme.primary }}>
+          <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
             <FileText className="w-5 h-5" /> Signatures
           </h2>
           {signatures && signatures.length > 0 ? (
@@ -126,11 +131,7 @@ const MeetingDetailsPage: React.FC = () => {
         <button
           onClick={() => navigate(-1)}
           className="mt-4 btn btn-outline"
-          style={{
-            borderColor: theme.primary,
-            color: theme.primary,
-            backgroundColor: theme["base-100"],
-          }}
+          style={{ borderColor: theme.primary, color: theme.primary }}
         >
           Go Back
         </button>
